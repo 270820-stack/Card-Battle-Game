@@ -30,24 +30,35 @@
 
 ## GitHub Pages (live demo) · 在线部署
 
-**Live URL (after you enable Pages once):**  
-**https://270820-stack.github.io/Card-Battle-Game/**
+**Site URL:** **https://270820-stack.github.io/Card-Battle-Game/**  
+（仓库需为 **Public**；免费账号对私有仓库不能使用 GitHub Pages。）
 
-### One-time setup (English)
+### Recommended: Deploy from branch（推荐：从分支发布，无 Actions）
 
-1. Open the repo on GitHub → **Settings** → **Pages**.
-2. Under **Build and deployment** → **Source**, choose **GitHub Actions** (not “Deploy from a branch”).
-3. Push to `main` (or run the **Deploy to GitHub Pages** workflow manually under **Actions**). Wait until the workflow finishes (green).
-4. The site URL is `https://<username>.github.io/<repo>/` — for this repo: **https://270820-stack.github.io/Card-Battle-Game/**
+This avoids `deploy-pages` **404** errors when Pages is not wired to GitHub Actions.
 
-Workflow file: `.github/workflows/pages.yml`. Root file `.nojekyll` disables Jekyll so all static assets are served as-is.
+**English**
 
-### 一次性设置（中文）
+1. Repo → **Settings** → **Pages**.
+2. **Build and deployment** → **Source** → **Deploy from a branch**.
+3. **Branch**: `main`, **folder**: `/ (root)` → **Save**.
+4. Wait ~1 minute; open **https://270820-stack.github.io/Card-Battle-Game/**
 
-1. 打开 GitHub 仓库 → **Settings（设置）** → **Pages（页面）**。  
-2. **Build and deployment** 里 **Source（源）** 选 **GitHub Actions**（不要选 “Deploy from a branch”）。  
-3. 将代码推到 `main`，或在 **Actions** 里手动运行 **Deploy to GitHub Pages**，等运行成功（绿勾）。  
-4. 访问地址格式：`https://用户名.github.io/仓库名/` — 本仓库为：**https://270820-stack.github.io/Card-Battle-Game/**  
+Root file **`.nojekyll`** turns off Jekyll so `assets/` and scripts are served correctly.
+
+**中文**
+
+1. 仓库 → **Settings** → **Pages**。  
+2. **Build and deployment** → **Source** → **Deploy from a branch**。  
+3. **Branch** 选 **`main`**，文件夹选 **`/ (root)`** → **Save**。  
+4. 等待约 1 分钟后访问：**https://270820-stack.github.io/Card-Battle-Game/**
+
+### If you used GitHub Actions before（若曾用 Actions）
+
+If a workflow failed with **Failed to create deployment (404)**：
+
+- Either complete **Settings → Pages → Source → GitHub Actions** (and grant Actions permissions), **or**
+- Switch **Source** to **Deploy from a branch** as above and **disable / delete** the Pages workflow so only one method is active.
 
 ---
 
