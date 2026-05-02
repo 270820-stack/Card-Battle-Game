@@ -94,3 +94,5 @@ Some browsers restrict `file://` for media or audio; if anything misbehaves, pre
 **游玩**：现代浏览器即可。  
 **重新生成素材**：部分脚本依赖 Python 3 与图中库；短片依赖 ffmpeg（可选）。
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
