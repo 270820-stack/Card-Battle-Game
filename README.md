@@ -1,4 +1,5 @@
 # Card Battle Game · 四格对决
+##**Demo URL:** **https://270820-stack.github.io/Card-Battle-Game/**  
 
 ## Overview (English)
 
@@ -28,39 +29,6 @@
 
 ---
 
-## GitHub Pages (live demo) · 在线部署
-
-**Site URL:** **https://270820-stack.github.io/Card-Battle-Game/**  
-（仓库需为 **Public**；免费账号对私有仓库不能使用 GitHub Pages。）
-
-### Recommended: Deploy from branch（推荐：从分支发布，无 Actions）
-
-This avoids `deploy-pages` **404** errors when Pages is not wired to GitHub Actions.
-
-**English**
-
-1. Repo → **Settings** → **Pages**.
-2. **Build and deployment** → **Source** → **Deploy from a branch**.
-3. **Branch**: `main`, **folder**: `/ (root)` → **Save**.
-4. Wait ~1 minute; open **https://270820-stack.github.io/Card-Battle-Game/**
-
-Root file **`.nojekyll`** turns off Jekyll so `assets/` and scripts are served correctly.
-
-**中文**
-
-1. 仓库 → **Settings** → **Pages**。  
-2. **Build and deployment** → **Source** → **Deploy from a branch**。  
-3. **Branch** 选 **`main`**，文件夹选 **`/ (root)`** → **Save**。  
-4. 等待约 1 分钟后访问：**https://270820-stack.github.io/Card-Battle-Game/**
-
-### If you used GitHub Actions before（若曾用 Actions）
-
-If a workflow failed with **Failed to create deployment (404)**：
-
-- Either complete **Settings → Pages → Source → GitHub Actions** (and grant Actions permissions), **or**
-- Switch **Source** to **Deploy from a branch** as above and **disable / delete** the Pages workflow so only one method is active.
-
----
 
 ## How to run · 如何运行
 
@@ -126,10 +94,3 @@ Some browsers restrict `file://` for media or audio; if anything misbehaves, pre
 **游玩**：现代浏览器即可。  
 **重新生成素材**：部分脚本依赖 Python 3 与图中库；短片依赖 ffmpeg（可选）。
 
----
-
-## License · 许可
-
-No license file is bundled. If you publish this project, add a `LICENSE` of your choice.
-
-当前仓库未附带许可证文件；若公开发布，请自行补充 `LICENSE`。
