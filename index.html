@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>四格对决 · 卡牌构筑</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="top-bar">
+      <h1>四格对决</h1>
+      <p class="subtitle">人机（AI）1v1 · 初始仅可布阵角色 · 掷硬币先后手 · 共用 20 张构筑（独立洗牌）</p>
+    </header>
+
+    <section id="screen-deck" class="screen active">
+      <div class="deck-panel">
+        <h2>构筑卡组（已选 <span id="deck-count">0</span> / 20）</h2>
+        <p id="deck-hint" class="deck-hint" aria-live="polite"></p>
+        <div class="deck-actions">
+          <button type="button" id="btn-fill-random" class="btn secondary">随机填满</button>
+          <button type="button" id="btn-clear-deck" class="btn secondary">清空</button>
+        </div>
+        <div id="pool-grid" class="card-grid"></div>
+      </div>
+      <div class="deck-panel">
+        <h2>当前携带</h2>
+        <div id="carried-list" class="carried-list"></div>
+        <button type="button" id="btn-start-battle" class="btn primary" disabled>开始对战</button>
+      </div>
+    </section>
+
+    <section id="screen-battle" class="screen">
+      <div class="enemy-hand-top" aria-hidden="true">
+        <div id="enemy-hand" class="hand hand--fan hand--enemy"></div>
+      </div>
+      <div class="battle-screen-inner">
+        <div class="battle-screen-wrap">
+        <div id="turn-counter" class="turn-counter" aria-live="polite"></div>
+        
+        <aside class="battle-left-rail battle-left-rail--with-turn" aria-label="圣水与对局操作">
+          <div class="battle-left-tray-inner">
+            <div class="battle-tray-hw battle-tray-hw--enemy">
+              <div class="hw-coin-wrap">
+                <div class="hw-coin">
+                  <span id="enemy-hw-num" class="hw-num">0</span>
+                </div>
+              </div>
+            </div>
+            <div class="battle-tray-hw battle-tray-hw--player">
+              <div class="hw-coin-wrap">
+                <div class="hw-coin">
+                  <span id="player-hw-num" class="hw-num">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <div class="battle-bottom-left-actions">
+          <div class="turn-actions">
+            <button type="button" id="btn-confirm" class="btn primary">确认结束回合</button>
+          </div>
+        </div>
+
+        <div class="battle-top-right-actions">
+          <button type="button" id="btn-surrender" class="btn secondary surrender" disabled>投降</button>
+        </div>
+
+        <div class="battle-main-stage">
+          <div class="battle-arena-center">
+            <div class="battle-layout battle-arena">
+              <div class="battle-side enemy">
+                <div class="side-label">敌方 · 手牌 <span id="enemy-hand-count">0</span></div>
+                <div id="enemy-board" class="board"></div>
+              </div>
+              <div class="battle-side player">
+                <div id="player-board" class="board"></div>
+                <div class="side-label">我方 · 手牌 <span id="player-hand-count">0</span></div>
+              </div>
+            </div>
+          </div>
+          <aside class="battle-log-wrap battle-log-rail" aria-label="战斗记录">
+            <div class="battle-log-sheet">
+              <div id="battle-status" class="battle-status"></div>
+              <div id="battle-log" class="battle-log"></div>
+            </div>
+          </aside>
+        </div>
+        </div>
+      </div>
+      <div class="battle-hand-dock" aria-label="我方手牌">
+        <div id="player-hand" class="hand hand--fan"></div>
+      </div>
+    </section>
+
+    <section id="screen-over" class="screen">
+      <div class="over-box">
+        <h2 id="over-title">对局结束</h2>
+        <p id="over-msg"></p>
+        <button type="button" id="btn-back-deck" class="btn primary">返回构筑</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="fx-layer" class="fx-layer" aria-hidden="true"></div>
+
+  <div id="coin-overlay" class="coin-overlay" aria-hidden="true">
+    <div class="coin-box">
+      <div id="coin-line1" class="coin-line1"></div>
+      <div id="coin-line2" class="coin-line2"></div>
+    </div>
+  </div>
+
+  <div id="surrender-overlay" class="confirm-overlay" aria-hidden="true">
+    <div class="confirm-box" role="dialog" aria-modal="true" aria-labelledby="surrender-dialog-title">
+      <p id="surrender-dialog-title" class="confirm-title">确认投降？</p>
+      <div class="confirm-actions">
+        <button type="button" id="btn-surrender-cancel" class="btn secondary">取消</button>
+        <button type="button" id="btn-surrender-ok" class="btn primary confirm-danger">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="board-card-detail" class="board-card-detail" aria-hidden="true">
+    <div class="board-card-detail-backdrop"></div>
+    <div
+      class="board-card-detail-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="board-card-detail-name"
+    >
+      <button type="button" class="board-card-detail-close" aria-label="关闭">×</button>
+      <div id="board-card-detail-thumb" class="board-card-detail-thumb"></div>
+      <div class="board-card-detail-meta">
+        <h3 id="board-card-detail-name" class="board-card-detail-name"></h3>
+        <div id="board-card-detail-tags" class="board-card-detail-tags"></div>
+        <div id="board-card-detail-stats" class="board-card-detail-stats"></div>
+        <div id="board-card-detail-skill" class="board-card-detail-block"></div>
+        <div id="board-card-detail-passive" class="board-card-detail-block"></div>
+        <div id="board-card-detail-extra" class="board-card-detail-block"></div>
+      </div>
+      <div id="board-card-detail-actions" class="board-card-detail-actions" hidden>
+        <button type="button" id="board-card-detail-recall" class="btn secondary">
+          换位 / 下阵
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="sfx.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

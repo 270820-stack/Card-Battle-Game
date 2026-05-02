@@ -1,0 +1,25 @@
+/* Merge into main stylesheet after ranger rules; remove parchment-scroll .pool-card.effect / .hand-card.is-effect thumb rules. */
+
+.pool-card[data-tid="heal"] .card-thumb,
+.hand-card[data-tid="heal"] .card-thumb,
+.slot.filled[data-tid="heal"] .slot-art {
+  background-image: url("assets/card-heal.png");
+}
+
+.pool-card[data-tid="buff"] .card-thumb,
+.hand-card[data-tid="buff"] .card-thumb,
+.slot.filled[data-tid="buff"] .slot-art {
+  background-image: url("assets/card-buff.png");
+}
+
+.pool-card[data-tid="skip"] .card-thumb,
+.hand-card[data-tid="skip"] .card-thumb,
+.slot.filled[data-tid="skip"] .slot-art {
+  background-image: url("assets/card-skip.png");
+}
+
+.pool-card[data-tid="bolt"] .card-thumb,
+.hand-card[data-tid="bolt"] .card-thumb,
+.slot.filled[data-tid="bolt"] .slot-art {
+  background-image: url("assets/card-bolt.png");
+}
