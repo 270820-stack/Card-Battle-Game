@@ -28,6 +28,29 @@
 
 ---
 
+## GitHub Pages (live demo) · 在线部署
+
+**Live URL (after you enable Pages once):**  
+**https://270820-stack.github.io/Card-Battle-Game/**
+
+### One-time setup (English)
+
+1. Open the repo on GitHub → **Settings** → **Pages**.
+2. Under **Build and deployment** → **Source**, choose **GitHub Actions** (not “Deploy from a branch”).
+3. Push to `main` (or run the **Deploy to GitHub Pages** workflow manually under **Actions**). Wait until the workflow finishes (green).
+4. The site URL is `https://<username>.github.io/<repo>/` — for this repo: **https://270820-stack.github.io/Card-Battle-Game/**
+
+Workflow file: `.github/workflows/pages.yml`. Root file `.nojekyll` disables Jekyll so all static assets are served as-is.
+
+### 一次性设置（中文）
+
+1. 打开 GitHub 仓库 → **Settings（设置）** → **Pages（页面）**。  
+2. **Build and deployment** 里 **Source（源）** 选 **GitHub Actions**（不要选 “Deploy from a branch”）。  
+3. 将代码推到 `main`，或在 **Actions** 里手动运行 **Deploy to GitHub Pages**，等运行成功（绿勾）。  
+4. 访问地址格式：`https://用户名.github.io/仓库名/` — 本仓库为：**https://270820-stack.github.io/Card-Battle-Game/**  
+
+---
+
 ## How to run · 如何运行
 
 ### English
