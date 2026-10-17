@@ -75,14 +75,14 @@
     },
     young_dragon: {
       type: "character",
-      name: "幼龙",
+      name: "雏龙",
       hp: 10,
       damage: 1,
       targetRule: "front_nearest_right",
       passive: "youngDragonHw",
       skill:
         "龙息 1：优先攻击正前方；若该格无角色则攻击最近一列，同距离优先右侧",
-      passiveDesc: "被动·蓄能：每次发动攻击后获得 1 圣水",
+      passiveDesc: "被动·蓄能：每次发动攻击后获得 1 灵药",
     },
     priest: {
       type: "character",
@@ -106,7 +106,7 @@
       skill:
         "龙焰 1：优先攻击正前方；若该格无角色则攻击最近一列，同距离优先右侧",
       passiveDesc:
-        "被动·血怒：造成伤害等于自身已损失生命（至少为 1）；若击杀目标可再发动一次相同攻击（消耗 3 圣水）",
+        "被动·血怒：造成伤害等于自身已损失生命（至少为 1）；若击杀目标可再发动一次相同攻击（消耗 3 灵药）",
     },
     mirror_mage: {
       type: "character",
@@ -171,13 +171,13 @@
       upgradeHolyWaterCost: 7,
       name: "狂战士",
       hp: 25,
-      damage: 3,
+      damage: 2,
       targetRule: "all_enemies",
       skill:
-        "猛击 3：对场上每一名敌方造成伤害；每名依次 +1（首名 3，第二 4，第三 5…）",
-      passive: "lifesteal30",
+        "猛击 2：对场上每一名敌方造成伤害；每名依次 +1（首名 2，第二 3，第三 4…）",
+      passive: "lifesteal20",
       passiveDesc:
-        "被动·嗜血：每次攻击后，回复本次攻击总伤害的 30%；对每名敌方依次递增 +1 伤害（从基础伤害起）",
+        "被动·嗜血：每次攻击后，回复本次攻击总伤害的 20%；对每名敌方依次递增 +1 伤害（从基础伤害起）",
     },
     divine_archer: {
       type: "character",
@@ -227,48 +227,48 @@
     heal: {
       type: "effect",
       name: "治疗术",
-      desc: "消耗 1 点圣水。使一名己方角色回复 6 点生命",
+      desc: "消耗 1 点灵药。使一名己方角色回复 6 点生命",
       effect: "heal",
       value: 6,
     },
     buff: {
       type: "effect",
       name: "战意",
-      desc: "消耗 1 点圣水。使一名己方角色下次攻击额外造成 3 点伤害",
+      desc: "消耗 1 点灵药。使一名己方角色下次攻击额外造成 3 点伤害",
       effect: "buff",
       value: 3,
     },
     skip: {
       type: "effect",
       name: "时间停滞",
-      desc: "消耗 3 点圣水。跳过敌方下一个回合（其无法出牌与攻击）",
+      desc: "消耗 3 点灵药。跳过敌方下一个回合（其无法出牌与攻击）",
       effect: "skip",
     },
     bolt: {
       type: "effect",
       name: "闪电",
-      desc: "消耗 1 点圣水。对一名敌方角色造成 2 点伤害",
+      desc: "消耗 1 点灵药。对一名敌方角色造成 2 点伤害",
       effect: "damage",
       value: 2,
     },
     ganyu: {
       type: "effect",
-      name: "甘雨",
-      desc: "获得 2 点圣水。",
+      name: "灵药",
+      desc: "获得 2 点灵药。",
       effect: "gain_holy_water",
       value: 2,
     },
     recruit: {
       type: "effect",
       name: "招募",
-      desc: "消耗 1 点圣水。从牌库抽取 2 张牌。",
+      desc: "消耗 1 点灵药。从牌库抽取 2 张牌。",
       effect: "draw_cards",
       value: 2,
     },
     holy_light: {
       type: "effect",
       name: "圣光",
-      desc: "消耗 4 点圣水。将我方场上所有角色恢复至满血。",
+      desc: "消耗 4 点灵药。将我方场上所有角色恢复至满血。",
       effect: "heal_all_full",
     },
   };
@@ -305,6 +305,124 @@
 
   /** 累计击败对方角色达此数即胜（可换将累加，与场上 4 格无关）。 */
   const WIN_DEFEAT_COUNT = 6;
+
+
+  function t(key, params) {
+    return typeof GameI18n !== "undefined" ? GameI18n.t(key, params) : key;
+  }
+  function tm(key, params) {
+    return typeof GameI18n !== "undefined" ? GameI18n.tm(key, params) : key;
+  }
+  function localizeCardDef(def, tid) {
+    if (!def) return def;
+    const loc =
+      typeof GameI18n !== "undefined" ? GameI18n.cardText(tid) : null;
+    if (!loc) return def;
+    return Object.assign({}, def, loc);
+  }
+  function relocalizeUnitNames(board) {
+    if (!board) return;
+    for (let i = 0; i < board.length; i++) {
+      const c = board[i];
+      if (!c) continue;
+      const def = getChar(c.templateId);
+      if (def && def.name) c.name = def.name;
+    }
+  }
+  function relocalizeAllNames() {
+    if (!battle) return;
+    relocalizeUnitNames(battle.playerBoard);
+    relocalizeUnitNames(battle.enemyBoard);
+  }
+  function applyStaticI18n() {
+    document.documentElement.lang =
+      typeof GameI18n !== "undefined" && GameI18n.getLang() === "en"
+        ? "en"
+        : "zh-CN";
+    document.title = t("title");
+    const brand = document.querySelector(".top-bar h1");
+    if (brand) brand.textContent = t("brand");
+    const sub = document.querySelector(".top-bar .subtitle");
+    if (sub) sub.textContent = t("subtitle");
+    const deckH2 = document.querySelector("#screen-deck .deck-panel h2");
+    if (deckH2) {
+      deckH2.innerHTML =
+        t("deck_build_h2_prefix") +
+        '<span id="deck-count">' +
+        (document.getElementById("deck-count")
+          ? document.getElementById("deck-count").textContent
+          : "0") +
+        "</span>" +
+        t("deck_build_h2_suffix");
+    }
+    const fill = document.getElementById("btn-fill-random");
+    if (fill) fill.textContent = t("btn_fill_random");
+    const clear = document.getElementById("btn-clear-deck");
+    if (clear) clear.textContent = t("btn_clear_deck");
+    const carriedH2 = document.querySelectorAll("#screen-deck .deck-panel h2")[1];
+    if (carriedH2) carriedH2.textContent = t("carried_h2");
+    const start = document.getElementById("btn-start-battle");
+    if (start) start.textContent = t("btn_start_battle");
+    const sideEnemy = document.querySelector(".battle-side.enemy .side-label");
+    if (sideEnemy) {
+      const n = document.getElementById("enemy-hand-count");
+      const count = n ? n.textContent : "0";
+      sideEnemy.innerHTML =
+        t("side_enemy") + '<span id="enemy-hand-count">' + count + "</span>";
+    }
+    const sidePlayer = document.querySelector(".battle-side.player .side-label");
+    if (sidePlayer) {
+      const n = document.getElementById("player-hand-count");
+      const count = n ? n.textContent : "0";
+      sidePlayer.innerHTML =
+        t("side_player") + '<span id="player-hand-count">' + count + "</span>";
+    }
+    const sur = document.getElementById("btn-surrender");
+    if (sur) sur.textContent = t("btn_surrender");
+    const back = document.getElementById("btn-back-deck");
+    if (back) back.textContent = t("btn_back_deck");
+    const overTitle = document.getElementById("over-title");
+    if (overTitle && (!battle || battle.phase !== "over")) {
+      overTitle.textContent = t("over_title_default");
+    }
+    const surTitle = document.getElementById("surrender-dialog-title");
+    if (surTitle) surTitle.textContent = t("surrender_title");
+    const surCancel = document.getElementById("btn-surrender-cancel");
+    if (surCancel) surCancel.textContent = t("cancel");
+    const surOk = document.getElementById("btn-surrender-ok");
+    if (surOk) surOk.textContent = t("confirm");
+    const closeBtn = document.querySelector(".board-card-detail-close");
+    if (closeBtn) closeBtn.setAttribute("aria-label", t("close"));
+    const recall = document.getElementById("board-card-detail-recall");
+    if (recall) recall.textContent = t("recall");
+    const leftRail = document.querySelector(".battle-left-rail");
+    if (leftRail) leftRail.setAttribute("aria-label", t("aria_holy_ops"));
+    const logRail = document.querySelector(".battle-log-rail");
+    if (logRail) logRail.setAttribute("aria-label", t("aria_battle_log"));
+    const handDock = document.querySelector(".battle-hand-dock");
+    if (handDock) handDock.setAttribute("aria-label", t("aria_player_hand"));
+    const langBtn = document.getElementById("btn-lang");
+    if (langBtn) {
+      const isEn =
+        typeof GameI18n !== "undefined" && GameI18n.getLang() === "en";
+      langBtn.textContent = isEn ? t("lang_to_zh") : t("lang_to_en");
+    }
+  }
+  function refreshLanguageUi() {
+    applyStaticI18n();
+    relocalizeAllNames();
+    const deckScreen = document.getElementById("screen-deck");
+    if (deckScreen && deckScreen.classList.contains("active")) {
+      renderDeckBuilder();
+    }
+    if (battle) {
+      updateTurnCounter();
+      updateHolyWaterPanel();
+      if (battle.phase === "over") applyEndGameText();
+      else renderBattle();
+    }
+  }
+
 
   /** 甘雨免费；时间停滞 3、圣光 4；其余效果牌均为 1 */
   function holyWaterCost(def) {
@@ -368,25 +486,16 @@
     const n = battle.turnCount || 0;
     const mult =
       n >= 15 ? 5 : n >= 10 ? 3 : n >= 5 ? 2 : 1;
-    let text = `回合 ${n}`;
-    if (mult > 1) text += ` · 每回合圣水×${mult}`;
+    let text = t("turn_n", { n });
+    if (mult > 1) text += t("turn_hw_mult", { n: mult });
     el.textContent = text;
   }
 
-  const TARGET_RULE_LABELS = {
-    front_nearest_right: "正前→最近→右",
-    lowest_hp: "最低生命",
-    highest_hp: "最高生命",
-    rightmost: "最右",
-    leftmost: "最左",
-    all_enemies: "全体",
-    ranger_random: "随机一·50%追加",
-    three_random: "单箭随机",
-    priest_heal: "≤5血优先/否则百分比",
-    priest_heal_two: "双目标同上",
-    dark_priest_skill: "随机伤+治疗",
-    random_living_enemy: "随机敌方",
-  };
+  function targetRuleLabel(rule) {
+    return typeof GameI18n !== "undefined"
+      ? GameI18n.ruleLabel(rule)
+      : rule || "";
+  }
 
   function delay(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -458,7 +567,7 @@
   }
 
   function getChar(templateId) {
-    return CARD_POOL[templateId];
+    return localizeCardDef(CARD_POOL[templateId], templateId);
   }
 
   /** 二级英雄：兼容 tier 为数字或字符串，避免误判为一级导致无法升级。 */
@@ -697,7 +806,7 @@
         const att = battle.playerBoard[slotIndex];
         if (!att || att.hp <= 0) return;
         pending++;
-        pushLog(`「${att.name}」被动·连环：再射一箭！`);
+        pushLog(tm("chain_shot_you", { name: att.name }));
         await delay(400);
       }
     }
@@ -729,7 +838,7 @@
         const att = battle.enemyBoard[slotIndex];
         if (!att || att.hp <= 0) return;
         pending++;
-        pushLog(`敌方「${att.name}」被动·连环：再射一箭！`);
+        pushLog(tm("chain_shot_enemy", { name: att.name }));
         await delay(400);
       }
     }
@@ -764,7 +873,10 @@
         if (killed && battle.playerHolyWater >= RAGE_DRAGON_FOLLOWUP_COST) {
           battle.playerHolyWater -= RAGE_DRAGON_FOLLOWUP_COST;
           pushLog(
-            `「${att.name}」被动·血怒：再发动一次（消耗 ${RAGE_DRAGON_FOLLOWUP_COST} 圣水）。`
+            tm("rage_again_you", {
+              name: att.name,
+              cost: RAGE_DRAGON_FOLLOWUP_COST,
+            })
           );
           renderBattle();
           await delay(400);
@@ -772,7 +884,10 @@
         }
         if (killed && battle.playerHolyWater < RAGE_DRAGON_FOLLOWUP_COST) {
           pushLog(
-            `「${att.name}」击杀目标，但圣水不足 ${RAGE_DRAGON_FOLLOWUP_COST}，无法追击。`
+            tm("rage_fail_you", {
+              name: att.name,
+              cost: RAGE_DRAGON_FOLLOWUP_COST,
+            })
           );
         }
       }
@@ -801,14 +916,17 @@
         if (killed && battle.enemyHolyWater >= RAGE_DRAGON_FOLLOWUP_COST) {
           battle.enemyHolyWater -= RAGE_DRAGON_FOLLOWUP_COST;
           pushLog(
-            `敌方「${att.name}」被动·血怒：再发动一次（消耗 ${RAGE_DRAGON_FOLLOWUP_COST} 圣水）。`
+            tm("rage_again_enemy", {
+              name: att.name,
+              cost: RAGE_DRAGON_FOLLOWUP_COST,
+            })
           );
           renderBattle();
           await delay(400);
           continue;
         }
         if (killed && battle.enemyHolyWater < RAGE_DRAGON_FOLLOWUP_COST) {
-          pushLog(`敌方「${att.name}」击杀目标，但圣水不足，无法追击。`);
+          pushLog(tm("rage_fail_enemy", { name: att.name }));
         }
       }
       return;
@@ -1054,8 +1172,8 @@
     if (!battle) return;
     const myBoard = isPlayerTurn ? battle.playerBoard : battle.enemyBoard;
     const oppBoard = isPlayerTurn ? battle.enemyBoard : battle.playerBoard;
-    const myTag = isPlayerTurn ? "我方" : "敌方";
-    const oppTag = isPlayerTurn ? "敌方" : "我方";
+    const myTag = isPlayerTurn ? t("ally") : t("enemy");
+    const oppTag = isPlayerTurn ? t("enemy") : t("ally");
     for (let i = 0; i < 4; i++) {
       const c = myBoard[i];
       if (!c || c.hp <= 0) continue;
@@ -1079,7 +1197,14 @@
       c.hp = Math.min(c.maxHp, hpB);
       enemy.hp = Math.min(enemy.maxHp, hpA);
       pushLog(
-        `${myTag}「${c.name}」命换：与${oppTag}「${enemy.name}」交换当前生命（${hpA}↔${hpB}）。`
+        tm("life_swap", {
+          my: myTag,
+          opp: oppTag,
+          a: c.name,
+          b: enemy.name,
+          ha: hpA,
+          hb: hpB,
+        })
       );
       renderBattle();
     }
@@ -1104,7 +1229,11 @@
         const hg = healGainAfterPoison(victim, 2);
         victim.hp = Math.min(victim.maxHp, victim.hp + hg);
         pushLog(
-          `「${hp.name}」神圣灵光：「${victim.name}」回复 ${hg} 生命。`
+          tm("holy_aura", {
+            priest: hp.name,
+            target: victim.name,
+            n: hg,
+          })
         );
         renderBattle();
         await delay(200);
@@ -1153,13 +1282,17 @@
           const tName = c.name;
           const rtNoteWar =
             rtCount > 0 && incoming !== effectiveAmount
-              ? `（圆桌护佑 ${incoming}→${effectiveAmount}）`
+              ? t("rt_note", { a: incoming, b: effectiveAmount })
               : "";
           pushLog(
-            `「${sName}」为「${tName}」分担 ${half} 点伤害，实际受到 ${rest} 点${rtNoteWar}（剩余 ${Math.max(
-              0,
-              c.hp
-            )}）。`
+            tm("share_dmg", {
+              s: sName,
+              t: tName,
+              half,
+              rest,
+              note: rtNoteWar,
+              hp: Math.max(0, c.hp),
+            })
           );
           return [gs, targetSlot];
         }
@@ -1167,24 +1300,30 @@
     }
 
     c.hp -= effectiveAmount;
-    const trueNote = trueDamage ? "（真实伤害）" : "";
+    const trueNote = trueDamage ? t("true_damage") : "";
     const rtNote =
       !trueDamage && rtCount > 0 && incoming !== effectiveAmount
-        ? `（圆桌护佑 ${incoming}→${effectiveAmount}）`
+        ? t("rt_note", { a: incoming, b: effectiveAmount })
         : "";
     if (victimIsPlayer) {
       pushLog(
-        `敌方对「${c.name}」造成 ${effectiveAmount} 点伤害${trueNote}${rtNote}（剩余 ${Math.max(
-          0,
-          c.hp
-        )}）。`
+        tm("dmg_to_you", {
+          name: c.name,
+          n: effectiveAmount,
+          true: trueNote,
+          rt: rtNote,
+          hp: Math.max(0, c.hp),
+        })
       );
     } else {
       pushLog(
-        `对敌方「${c.name}」造成 ${effectiveAmount} 点伤害${trueNote}${rtNote}（剩余 ${Math.max(
-          0,
-          c.hp
-        )}）。`
+        tm("dmg_to_enemy", {
+          name: c.name,
+          n: effectiveAmount,
+          true: trueNote,
+          rt: rtNote,
+          hp: Math.max(0, c.hp),
+        })
       );
     }
     return [targetSlot];
@@ -1218,9 +1357,12 @@
         await delay(280);
         await playAttackVfx(c.templateId, fromSide, slot, toSide, target, dmg);
         pushLog(
-          `「${c.name}」反击：随机命中「${
-            victimIsPlayerBoard ? battle.enemyBoard[target].name : battle.playerBoard[target].name
-          }」。`
+          tm("counter", {
+            name: c.name,
+            target: victimIsPlayerBoard
+              ? battle.enemyBoard[target].name
+              : battle.playerBoard[target].name,
+          })
         );
         if (victimIsPlayerBoard) {
           await dealDamageToEnemySlot(target, dmg);
@@ -1288,6 +1430,14 @@
     const wrap = el("div", "fx-tier2-upgrade fx-tier2-upgrade--" + tid);
     wrap.setAttribute("aria-hidden", "true");
     wrap.dataset.tier2Id = tid;
+    const defForJob = getChar(templateId);
+    const jobFrom =
+      defForJob &&
+      defForJob.upgradesFrom &&
+      /^[a-z][a-z0-9_]*$/i.test(String(defForJob.upgradesFrom))
+        ? String(defForJob.upgradesFrom)
+        : null;
+    if (jobFrom) wrap.classList.add("fx-tier2-upgrade--job-" + jobFrom);
     wrap.style.setProperty("--fx-x", cx + "px");
     wrap.style.setProperty("--fx-y", cy + "px");
     const vid = document.createElement("video");
@@ -1301,9 +1451,10 @@
     const vignette = el("div", "fx-tier2-upgrade-vignette");
     const beams = el("div", "fx-tier2-upgrade-beams");
     const pulse = el("div", "fx-tier2-upgrade-pulse");
-    const def = getChar(templateId);
     const label = el("div", "fx-tier2-upgrade-label");
-    label.textContent = def ? "升级 · " + def.name : "升级";
+    label.textContent = defForJob
+      ? t("upgrade_of", { name: defForJob.name })
+      : t("upgrade");
     wrap.appendChild(vid);
     wrap.appendChild(motif);
     wrap.appendChild(vignette);
@@ -1350,7 +1501,7 @@
     const meta = el("div", "meta");
     meta.textContent =
       def.type === "character"
-        ? `生命 ${def.hp} · 伤害 ${def.damage}`
+        ? tm("fx_life", { hp: def.hp, dmg: def.damage })
         : def.desc || "";
     text.appendChild(meta);
     card.appendChild(thumb);
@@ -1856,10 +2007,10 @@
     if (def.tier) {
       const sp = document.createElement("span");
       sp.className = "board-card-detail-tag";
-      sp.textContent = "二级英雄";
+      sp.textContent = t("tier2_hero");
       tagsEl.appendChild(sp);
     }
-    const tr = TARGET_RULE_LABELS[def.targetRule] || def.targetRule;
+    const tr = targetRuleLabel(def.targetRule) || def.targetRule;
     if (tr) {
       const sp = document.createElement("span");
       sp.className = "board-card-detail-tag";
@@ -1870,30 +2021,30 @@
     const atk = (c.damage || 0) + (c.bonusDamage || 0);
     statsEl.innerHTML = "";
     statsEl.appendChild(
-      el("div", "board-card-detail-stat-line", `攻击 ${atk}`)
+      el("div", "board-card-detail-stat-line", t("attack", { n: atk }))
     );
     statsEl.appendChild(
-      el("div", "board-card-detail-stat-line", `生命 ${c.hp} / ${c.maxHp}`)
+      el("div", "board-card-detail-stat-line", t("hp_slash", { cur: c.hp, max: c.maxHp }))
     );
     if (c.poison) {
       statsEl.appendChild(
         el(
           "div",
           "board-card-detail-stat-line board-card-detail-stat-line--poison",
-          "中毒：治疗效力降低，受击额外伤害"
+          t("poison_stat")
         )
       );
     }
 
     skillEl.innerHTML = "";
     if (def.skill) {
-      skillEl.appendChild(el("div", "board-card-detail-label", "技能"));
+      skillEl.appendChild(el("div", "board-card-detail-label", t("skill")));
       skillEl.appendChild(el("p", "board-card-detail-text", def.skill));
     }
 
     passiveEl.innerHTML = "";
     if (def.passiveDesc) {
-      passiveEl.appendChild(el("div", "board-card-detail-label", "被动"));
+      passiveEl.appendChild(el("div", "board-card-detail-label", t("passive")));
       passiveEl.appendChild(el("p", "board-card-detail-text", def.passiveDesc));
     }
 
@@ -1903,7 +2054,7 @@
         el(
           "div",
           "board-card-detail-extra-note",
-          `下次攻击额外 ${c.bonusDamage} 点伤害`
+          t("bonus_next", { n: c.bonusDamage })
         )
       );
     }
@@ -2017,7 +2168,12 @@
     if (!battle) return;
     board.forEach((c, i) => {
       if (c && c.hp <= 0) {
-        pushLog(`${isEnemy ? "敌方" : "我方"}「${c.name}」被击败。`);
+        pushLog(
+          tm("defeated", {
+            side: isEnemy ? t("enemy") : t("ally"),
+            name: c.name,
+          })
+        );
         if (isEnemy) battle.enemyDefeatCount++;
         else battle.playerDefeatCount++;
         board[i] = null;
@@ -2078,7 +2234,7 @@
       await playHealVfx("player", attSlot, "player", t);
       const g3 = healGainAfterPoison(ally, 3);
       ally.hp = Math.min(ally.maxHp, ally.hp + g3);
-      pushLog(`「${att.name}」：「${ally.name}」回复 ${g3} 生命。`);
+      pushLog(tm("heal_log", { a: att.name, b: ally.name, n: g3 }));
       renderBattle();
       await delay(200);
       return;
@@ -2096,7 +2252,7 @@
         await playHealVfx("player", attSlot, "player", t);
         const g6 = healGainAfterPoison(ally, 6);
         ally.hp = Math.min(ally.maxHp, ally.hp + g6);
-        pushLog(`「${att.name}」：「${ally.name}」回复 ${g6} 生命。`);
+        pushLog(tm("heal_log", { a: att.name, b: ally.name, n: g6 }));
         renderBattle();
         await delay(200);
       }
@@ -2120,7 +2276,7 @@
       await playHealVfx("player", attSlot, "player", t);
       const g5 = healGainAfterPoison(ally, 5);
       ally.hp = Math.min(ally.maxHp, ally.hp + g5);
-      pushLog(`「${att.name}」：「${ally.name}」回复 ${g5} 生命。`);
+      pushLog(tm("heal_log", { a: att.name, b: ally.name, n: g5 }));
       renderBattle();
       await delay(200);
     }
@@ -2139,7 +2295,7 @@
       await playHealVfx("enemy", attSlot, "enemy", t);
       const eg3 = healGainAfterPoison(ally, 3);
       ally.hp = Math.min(ally.maxHp, ally.hp + eg3);
-      pushLog(`敌方「${att.name}」：「${ally.name}」回复 ${eg3} 生命。`);
+      pushLog(tm("heal_log_enemy", { a: att.name, b: ally.name, n: eg3 }));
       renderBattle();
       await delay(200);
       return;
@@ -2157,7 +2313,7 @@
         await playHealVfx("enemy", attSlot, "enemy", t);
         const eg6 = healGainAfterPoison(ally, 6);
         ally.hp = Math.min(ally.maxHp, ally.hp + eg6);
-        pushLog(`敌方「${att.name}」：「${ally.name}」回复 ${eg6} 生命。`);
+        pushLog(tm("heal_log_enemy", { a: att.name, b: ally.name, n: eg6 }));
         renderBattle();
         await delay(200);
       }
@@ -2181,7 +2337,7 @@
       await playHealVfx("enemy", attSlot, "enemy", t);
       const eg5 = healGainAfterPoison(ally, 5);
       ally.hp = Math.min(ally.maxHp, ally.hp + eg5);
-      pushLog(`敌方「${att.name}」：「${ally.name}」回复 ${eg5} 生命。`);
+      pushLog(tm("heal_log_enemy", { a: att.name, b: ally.name, n: eg5 }));
       renderBattle();
       await delay(200);
     }
@@ -2296,16 +2452,16 @@
         renderBattle();
         if (win()) return;
       }
-          if (def.passive === "lifesteal30" && totalDamage > 0) {
-            const healRaw = (totalDamage * 0.3) | 0;
+          if (def.passive === "lifesteal20" && totalDamage > 0) {
+            const healRaw = (totalDamage * 0.2) | 0;
             if (healRaw > 0) {
               c = ab[i];
               if (c && c.hp > 0) {
                 const heal = healGainAfterPoison(c, healRaw);
                 c.hp = Math.min(c.maxHp, c.hp + heal);
                 if (attackerIsPlayer)
-                  pushLog(`「${c.name}」嗜血回复 ${heal} 生命。`);
-                else pushLog(`敌方「${c.name}」嗜血回复 ${heal} 生命。`);
+                  pushLog(tm("lifesteal_you", { name: c.name, n: heal }));
+                else pushLog(tm("lifesteal_enemy", { name: c.name, n: heal }));
                 renderBattle();
               }
             }
@@ -2318,8 +2474,8 @@
         if (shot === 1 && attName) {
           pushLog(
             attackerIsPlayer
-              ? `「${attName}」连射：再射一箭！`
-              : `敌方「${attName}」连射：再射一箭！`
+              ? tm("ranger_extra_you", { name: attName })
+              : tm("ranger_extra_enemy", { name: attName })
           );
           renderBattle();
           await delay(280);
@@ -2360,13 +2516,13 @@
             HOLY_WATER_MAX,
             battle.playerHolyWater + 1
           );
-          pushLog(`「${att.name}」幼龙：获得 1 圣水。`);
+          pushLog(tm("young_hw_you", { name: att.name }));
         } else {
           battle.enemyHolyWater = Math.min(
             HOLY_WATER_MAX,
             battle.enemyHolyWater + 1
           );
-          pushLog(`敌方「${att.name}」幼龙：获得 1 圣水。`);
+          pushLog(tm("young_hw_enemy", { name: att.name }));
         }
         renderBattle();
       }
@@ -2387,12 +2543,15 @@
     clearPoisonAfterEnemyAttackPhase();
   }
 
-  function endGame(won, options) {
-    const surrender = options && options.surrender;
-    battle.phase = "over";
-    playSfx(won ? "fanfareWin" : "fanfareLose");
-    showScreen("screen-over");
-    document.getElementById("over-title").textContent = won ? "胜利" : "失败";
+  let lastEndGame = null;
+
+  function applyEndGameText() {
+    if (!battle || !lastEndGame) return;
+    const won = lastEndGame.won;
+    const surrender = lastEndGame.surrender;
+    document.getElementById("over-title").textContent = won
+      ? t("victory")
+      : t("defeat");
     const reachedEnemyGoal = battle.enemyDefeatCount >= WIN_DEFEAT_COUNT;
     const empty = enemyWiped();
     const reachedPlayerGoal = battle.playerDefeatCount >= WIN_DEFEAT_COUNT;
@@ -2400,18 +2559,37 @@
     let msg;
     if (won) {
       msg =
-        `击败次数 ${battle.enemyDefeatCount}/${WIN_DEFEAT_COUNT}` +
-        (reachedEnemyGoal ? ` · 已达成${WIN_DEFEAT_COUNT}次击败` : "") +
-        (empty ? " · 敌方场上已清空" : "");
+        t("win_msg", {
+          n: battle.enemyDefeatCount,
+          max: WIN_DEFEAT_COUNT,
+        }) +
+        (reachedEnemyGoal
+          ? t("goal_reached", { n: WIN_DEFEAT_COUNT })
+          : "") +
+        (empty ? t("enemy_cleared") : "");
     } else if (surrender) {
-      msg = "你选择投降。";
+      msg = t("surrendered");
     } else {
       msg =
-        `我方被击败 ${battle.playerDefeatCount}/${WIN_DEFEAT_COUNT}` +
-        (reachedPlayerGoal ? ` · 已达成${WIN_DEFEAT_COUNT}次击败` : "") +
-        (pEmpty ? " · 我方场上已清空" : "");
+        t("lose_msg", {
+          n: battle.playerDefeatCount,
+          max: WIN_DEFEAT_COUNT,
+        }) +
+        (reachedPlayerGoal
+          ? t("goal_reached", { n: WIN_DEFEAT_COUNT })
+          : "") +
+        (pEmpty ? t("player_cleared") : "");
     }
     document.getElementById("over-msg").textContent = msg;
+  }
+
+  function endGame(won, options) {
+    const surrender = !!(options && options.surrender);
+    battle.phase = "over";
+    lastEndGame = { won: !!won, surrender };
+    playSfx(won ? "fanfareWin" : "fanfareLose");
+    showScreen("screen-over");
+    applyEndGameText();
   }
 
   function renderDeckBuilder() {
@@ -2429,8 +2607,7 @@
     const hintEl = document.getElementById("deck-hint");
     if (hintEl) {
       if (carried.length === 20 && !deckHasTierOneHero(carried)) {
-        hintEl.textContent =
-          "需至少包含一张一级英雄卡（如守卫、法师、刺客、战士、游侠、幼龙、牧师等）。";
+        hintEl.textContent = t("deck_hint_need_t1");
         hintEl.classList.add("deck-hint--warn");
       } else {
         hintEl.textContent = "";
@@ -2439,7 +2616,7 @@
     }
 
     POOL_ORDER.forEach((tid) => {
-      const def = CARD_POOL[tid];
+      const def = getChar(tid);
       const card = el(
         "button",
         "pool-card " +
@@ -2463,12 +2640,14 @@
       const name = el("div", "name", def.name);
       const meta = el("div", "meta");
       if (def.type === "character") {
-        const tag = TARGET_RULE_LABELS[def.targetRule] || def.targetRule || "";
-        let line = `生命 ${def.hp} · 伤害 ${def.damage} · ${tag}`;
+        const tag = targetRuleLabel(def.targetRule) || def.targetRule || "";
+        let line =
+          t("hp_meta", { hp: def.hp, dmg: def.damage }) +
+          (tag ? " · " + tag : "");
         if (def.passiveDesc) line += ` · ${def.passiveDesc}`;
         if (def.tier === 2)
-          line += ` · 二级（需场上一级对应英雄+${def.upgradeHolyWaterCost || 0}圣水升级）`;
-        else if (recPool > 0) line += ` · 对战上场${recPool}圣水`;
+          line += t("tier2_pool", { n: def.upgradeHolyWaterCost || 0 });
+        else if (recPool > 0) line += t("recruit_cost", { n: recPool });
         meta.textContent = line;
       } else {
         meta.textContent = def.desc;
@@ -2487,7 +2666,7 @@
     });
 
     carried.forEach((tid, idx) => {
-      const def = CARD_POOL[tid];
+      const def = getChar(tid);
       const row = el("span", "chip");
       row.appendChild(document.createTextNode(def.name));
       const rm = el("button", "remove", "×");
@@ -2521,7 +2700,7 @@
       enemyBoard: [null, null, null, null],
       playerDiscard: [],
       enemyDiscard: [],
-      log: ["对局开始。请完成己方布阵（仅可将角色牌放置上场）。"],
+      log: [t("battle_start_log")],
       enemyDefeatCount: 0,
       playerDefeatCount: 0,
       skipEnemyNext: false,
@@ -2545,14 +2724,14 @@
     const line1 = document.getElementById("coin-line1");
     const line2 = document.getElementById("coin-line2");
     overlay.setAttribute("aria-hidden", "false");
-    line1.textContent = "掷硬币中…";
+    line1.textContent = t("coin_flipping");
     line2.textContent = "";
     await delay(900);
     const playerFirst = Math.random() < 0.5;
     playSfx("coin");
     battle.firstPlayer = playerFirst ? "player" : "enemy";
-    line1.textContent = playerFirst ? "你获得先手" : "敌方先手";
-    line2.textContent = playerFirst ? "进入你的回合" : "敌方先行动";
+    line1.textContent = playerFirst ? t("you_first") : t("enemy_first");
+    line2.textContent = playerFirst ? t("enter_your_turn") : t("enemy_acts_first");
     await delay(1400);
     overlay.setAttribute("aria-hidden", "true");
     if (playerFirst) {
@@ -2560,10 +2739,10 @@
       gainHolyWater("player");
       resetHolyPriestReactiveBoard(battle.playerBoard);
       applyDarkPriestTurnStart(true);
-      pushLog("你为先手。");
+      pushLog(t("you_first_log"));
     } else {
       battle.phase = "enemy";
-      pushLog("敌方先手。");
+      pushLog(t("enemy_first_log"));
       renderBattle();
       await runEnemyTurn();
     }
@@ -2611,11 +2790,11 @@
       };
       attachHolyPriestReactiveFields(placed, pick.templateId);
       battle.enemyBoard[slot] = placed;
-      pushLog(`人机在格 ${slot + 1} 放置「${def.name}」。`);
+      pushLog(tm("ai_place", { slot: slot + 1, name: def.name }));
       renderBattle();
     }
     await enemyTryRepositionIfBeneficial();
-    pushLog("人机完成布阵。");
+    pushLog(t("ai_setup_done"));
     await runCoinFlip();
   }
 
@@ -2623,7 +2802,7 @@
     if (!battle || battle.phase !== "setup") return;
     pendingRecallSlotIndex = null;
     playSfx("paper");
-    pushLog("我方布阵完成。");
+    pushLog(t("player_setup_done"));
     battle.phase = "enemy_setup";
     renderBattle();
     void runEnemySetup();
@@ -2729,9 +2908,7 @@
       hp: worst.hp,
       maxHp: worst.maxHp,
     });
-    pushLog(
-      `人机：换下「${worst.name}」（${worst.hp}/${worst.maxHp}），换上「${defNew.name}」（${hpFromHand}/${defNew.hp}）。`
-    );
+    pushLog(tm("ai_swap", { old: worst.name, ohp: worst.hp, omax: worst.maxHp, new: defNew.name, nhp: hpFromHand, nmax: defNew.hp }));
     renderBattle();
     if (!rectSwap) animEnemySlot(worstSlot, "anim-enter");
   }
@@ -2810,7 +2987,7 @@
       const b = battle.enemyBoard[j];
       battle.enemyBoard[i] = b;
       battle.enemyBoard[j] = a;
-      pushLog(`人机：调整「${b.name}」与「${a.name}」的站位。`);
+      pushLog(tm("ai_repo_swap", { a: b.name, b: a.name }));
       renderBattle();
       animEnemySlot(i, "anim-enter");
       animEnemySlot(j, "anim-enter");
@@ -2819,7 +2996,7 @@
       const mover = battle.enemyBoard[from];
       battle.enemyBoard[to] = mover;
       battle.enemyBoard[from] = null;
-      pushLog(`人机：「${mover.name}」调整站位。`);
+      pushLog(tm("ai_repo_move", { name: mover.name }));
       renderBattle();
       animEnemySlot(to, "anim-enter");
     }
@@ -2873,9 +3050,7 @@
         };
         attachHolyPriestReactiveFields(upgraded, u.tier2);
         battle.enemyBoard[i] = upgraded;
-        pushLog(
-          `人机：将「${getChar(u.from).name}」升级为「${def.name}」（生命 ${newHp}/${def.hp}）。`
-        );
+        pushLog(tm("ai_upgrade", { from: getChar(u.from).name, to: def.name, hp: newHp, max: def.hp }));
         renderBattle();
         requestAnimationFrame(() => {
           playTier2UpgradeEffect(i, "enemy", u.tier2);
@@ -2890,7 +3065,7 @@
     if (!battle || battle.phase !== "enemy") return;
     if (battle.skipEnemyNext) {
       battle.skipEnemyNext = false;
-      pushLog("敌方本回合被跳过（时间停滞）。");
+      pushLog(tm("enemy_skipped"));
       await delay(500);
       if (!startPlayerTurnFromEnemy()) return;
       return;
@@ -2902,7 +3077,7 @@
     applyDarkPriestTurnStart(false);
     if (battle.enemyDeck.length) {
       battle.enemyHand.push(battle.enemyDeck.pop());
-      pushLog("敌方抽 1 张牌。");
+      pushLog(tm("enemy_draw1"));
     }
     renderBattle();
 
@@ -2955,7 +3130,7 @@
       };
       attachHolyPriestReactiveFields(placed, bestH.templateId);
       battle.enemyBoard[slot] = placed;
-      pushLog(`人机在格 ${slot + 1} 放置「${def.name}」。`);
+      pushLog(tm("ai_place", { slot: slot + 1, name: def.name }));
       renderBattle();
     }
 
@@ -2986,7 +3161,7 @@
   function startPlayerTurnFromEnemy() {
     if (battle.skipPlayerNext) {
       battle.skipPlayerNext = false;
-      pushLog("你方回合被跳过。");
+      pushLog(tm("you_skipped"));
       battle.phase = "enemy";
       renderBattle();
       void runEnemyTurn();
@@ -2997,7 +3172,7 @@
     applyDarkPriestTurnStart(true);
     if (battle.playerDeck.length) {
       battle.playerHand.push(battle.playerDeck.pop());
-      pushLog("你抽 1 张牌。");
+      pushLog(tm("you_draw1"));
     }
     battle.phase = "player";
     renderBattle();
@@ -3116,7 +3291,7 @@
         }
         const eg = healGainAfterPoison(board[t], def.value);
         board[t].hp = Math.min(board[t].maxHp, board[t].hp + eg);
-        pushLog(`人机：「${def.name}」·「${board[t].name}」回复生命。`);
+        pushLog(tm("ai_heal", { card: def.name, target: board[t].name }));
         battle.enemyHand.splice(hi, 1);
         battle.enemyDiscard.push(h);
         animEnemySlot(t, "anim-effect");
@@ -3133,7 +3308,7 @@
           }
         }
         board[t].bonusDamage = (board[t].bonusDamage || 0) + def.value;
-        pushLog(`人机：「${def.name}」强化「${board[t].name}」。`);
+        pushLog(tm("ai_buff", { card: def.name, target: board[t].name }));
         battle.enemyHand.splice(hi, 1);
         battle.enemyDiscard.push(h);
         animEnemySlot(t, "anim-effect");
@@ -3146,7 +3321,7 @@
           HOLY_WATER_MAX,
           battle.enemyHolyWater + def.value
         );
-        pushLog(`人机：「${def.name}」获得 ${def.value} 点圣水。`);
+        pushLog(tm("ai_gain_hw", { name: def.name, n: def.value }));
         battle.enemyHand.splice(hi, 1);
         battle.enemyDiscard.push(h);
       } else if (def.effect === "draw_cards") {
@@ -3159,7 +3334,7 @@
           battle.enemyHand.push(battle.enemyDeck.pop());
           n++;
         }
-        pushLog(`人机：「${def.name}」抽取 ${n} 张牌。`);
+        pushLog(tm("ai_draw_n", { name: def.name, n }));
         battle.enemyHand.splice(hi, 1);
         battle.enemyDiscard.push(h);
       } else if (def.effect === "heal_all_full") {
@@ -3176,7 +3351,7 @@
           board[j].hp = board[j].maxHp;
           animEnemySlot(j, "anim-effect");
         }
-        pushLog(`人机：「${def.name}」：己方全体恢复至满血。`);
+        pushLog(tm("ai_holy_light", { name: def.name }));
         battle.enemyHand.splice(hi, 1);
         battle.enemyDiscard.push(h);
       } else if (def.effect === "skip") {
@@ -3184,7 +3359,7 @@
         if (battle.enemyHolyWater < hwc) break;
         battle.enemyHolyWater -= hwc;
         battle.skipPlayerNext = true;
-        pushLog("人机：「时间停滞」— 你下一回合将被跳过。");
+        pushLog(tm("ai_time_stop"));
         battle.enemyHand.splice(hi, 1);
         battle.enemyDiscard.push(h);
       } else if (def.effect === "damage" && foes.length) {
@@ -3230,29 +3405,32 @@
       battle.phase === "coin";
     const winHint = inPrep
       ? ""
-      : `击败敌方 ${battle.enemyDefeatCount}/${WIN_DEFEAT_COUNT} · 我方被击败 ${battle.playerDefeatCount}/${WIN_DEFEAT_COUNT} · `;
+      : t("win_hint", {
+          e: battle.enemyDefeatCount,
+          p: battle.playerDefeatCount,
+          max: WIN_DEFEAT_COUNT,
+        });
     if (battle.phase === "setup") {
       status.textContent =
         pendingRecallSlotIndex !== null
-          ? "已选上场格：点另一有角色格可换位，点空位可移动，点手牌栏下阵；再点原格取消"
-          : "初始布阵 · 点击场上角色可查看技能与被动 · 仅可摆放角色牌 · 效果牌呈灰阶不可用 · 点手牌上场后再点手牌栏下阵 · 完成后掷硬币定先后手";
+          ? t("status_recall")
+          : t("status_setup");
     } else if (battle.phase === "enemy_setup") {
-      status.textContent = "人机正在布阵…";
+      status.textContent = t("status_enemy_setup");
     } else if (battle.phase === "coin") {
-      status.textContent = "掷硬币决定先后手…";
+      status.textContent = t("status_coin");
     } else if (battle.phase === "player") {
-      let t = pendingEffect
-        ? "请选择目标（场上卡牌）"
+      let st = pendingEffect
+        ? t("status_pick_target")
         : pendingRecallSlotIndex !== null
-          ? "已选上场格：点另一有角色格可换位，点空位可移动，点手牌栏下阵；再点原格取消"
-          : "你的回合 · 点击场上单位可查看描述 · 选中手牌后点格子上阵或替换；弹窗内可换位/下阵";
-      if (battle.skipEnemyNext) t += " · 下回合将跳过敌方";
-      status.textContent = winHint + t;
+          ? t("status_recall")
+          : t("status_your_turn");
+      if (battle.skipEnemyNext) st += t("status_skip_enemy");
+      status.textContent = winHint + st;
     } else if (battle.phase === "resolving") {
-      status.textContent = winHint + "结算中…";
+      status.textContent = winHint + t("status_resolving");
     } else {
-      status.textContent =
-        winHint + "人机行动中，请稍候… · 可点击场上单位查看描述";
+      status.textContent = winHint + t("status_enemy_turn");
     }
 
     const logEl = document.getElementById("battle-log");
@@ -3275,7 +3453,7 @@
       if (c && c.hp > 0) {
         slot.classList.add("filled", "slot--token");
         slot.dataset.tid = c.templateId;
-        slot.title = `${c.name} · 点击查看详情`;
+        slot.title = t("click_detail", { name: c.name });
         const frame = el("div", "slot-token-frame");
         const art = el("div", "slot-art slot-art--token");
         art.setAttribute("aria-hidden", "true");
@@ -3297,12 +3475,12 @@
           skull.alt = "";
           skull.decoding = "async";
           skull.setAttribute("aria-hidden", "true");
-          skull.title = "中毒";
+          skull.title = t("poison");
           slot.appendChild(skull);
         }
       } else {
         slot.classList.add("empty-hint");
-        slot.textContent = "空位";
+        slot.textContent = t("empty_slot");
         if (playerCanAct && selectedHandUid) {
           const h = handByUid(selectedHandUid);
           if (h && getChar(h.templateId).type === "character") {
@@ -3331,7 +3509,7 @@
       if (c && c.hp > 0) {
         slot.classList.add("filled", "slot--token");
         slot.dataset.tid = c.templateId;
-        slot.title = `${c.name} · 点击查看详情`;
+        slot.title = t("click_detail", { name: c.name });
         const frame = el("div", "slot-token-frame");
         const art = el("div", "slot-art slot-art--token");
         art.setAttribute("aria-hidden", "true");
@@ -3350,12 +3528,12 @@
           skull.alt = "";
           skull.decoding = "async";
           skull.setAttribute("aria-hidden", "true");
-          skull.title = "中毒";
+          skull.title = t("poison");
           slot.appendChild(skull);
         }
       } else {
         slot.classList.add("empty-hint");
-        slot.textContent = "空";
+        slot.textContent = t("empty");
       }
       eBoard.appendChild(slot);
     }
@@ -3390,17 +3568,26 @@
       text.appendChild(el("div", "name", def.name));
       const meta = el("div", "meta");
       if (def.type === "character") {
-        const tag = TARGET_RULE_LABELS[def.targetRule] || "";
+        const tag = targetRuleLabel(def.targetRule) || "";
         const hpLine =
           typeof h.hp === "number" && h.hp > 0
-            ? `生命 ${h.hp}/${h.maxHp != null ? h.maxHp : def.hp}`
-            : `生命 ${def.hp}`;
-        let line = `${hpLine} · 伤害 ${def.damage}` + (tag ? ` · ${tag}` : "");
+            ? t("hp_hand", {
+                cur: h.hp,
+                max: h.maxHp != null ? h.maxHp : def.hp,
+              })
+            : t("hp_only", { hp: def.hp });
+        let line =
+          hpLine +
+          " · " +
+          t("dmg_word") +
+          " " +
+          def.damage +
+          (tag ? ` · ${tag}` : "");
         if (def.passiveDesc) line += ` · ${def.passiveDesc}`;
         if (Number(def.tier) === 2)
-          line += ` · 二级（点场上一级对应英雄，${def.upgradeHolyWaterCost || 0}圣水）`;
-        else if (recCost > 0) line += ` · 对战上场${recCost}圣水`;
-        if (h.recalledFromBoard) line += " · 下阵";
+          line += t("tier2_hand", { n: def.upgradeHolyWaterCost || 0 });
+        else if (recCost > 0) line += t("recruit_cost", { n: recCost });
+        if (h.recalledFromBoard) line += t("recalled_tag");
         meta.textContent = line;
       } else {
         meta.textContent = def.desc;
@@ -3515,7 +3702,8 @@
     }
 
     const btnConfirm = document.getElementById("btn-confirm");
-    btnConfirm.textContent = battle.phase === "setup" ? "完成布阵" : "确认结束回合";
+    btnConfirm.textContent =
+      battle.phase === "setup" ? t("btn_confirm_setup") : t("btn_confirm_turn");
     btnConfirm.disabled =
       !playerCanAct ||
       battle.phase === "coin" ||
@@ -3540,29 +3728,25 @@
     if (def.type !== "effect") return;
     if (def.effect === "heal") {
       if (battle.playerHolyWater < holyWaterCost(def)) {
-        pushLog(
-          `圣水不足：需要 ${holyWaterCost(def)} 点圣水（当前 ${battle.playerHolyWater}）。`
-        );
+        pushLog(tm("hw_need", { need: holyWaterCost(def), cur: battle.playerHolyWater }));
         renderBattle();
         return;
       }
       pendingRecallSlotIndex = null;
       pendingEffect = { type: "heal", card: h, value: def.value };
-      pushLog("请选择一名己方角色回复生命。");
+      pushLog(tm("pick_heal"));
     } else if (def.effect === "buff") {
       if (battle.playerHolyWater < holyWaterCost(def)) {
-        pushLog(
-          `圣水不足：需要 ${holyWaterCost(def)} 点圣水（当前 ${battle.playerHolyWater}）。`
-        );
+        pushLog(tm("hw_need", { need: holyWaterCost(def), cur: battle.playerHolyWater }));
         renderBattle();
         return;
       }
       pendingRecallSlotIndex = null;
       pendingEffect = { type: "buff", card: h, value: def.value };
-      pushLog("请选择一名己方角色获得战意。");
+      pushLog(tm("pick_buff"));
     } else if (def.effect === "gain_holy_water") {
       if (battle.playerHolyWater >= HOLY_WATER_MAX) {
-        pushLog("圣水已满，无法使用「甘雨」。");
+        pushLog(tm("ganyu_full"));
         renderBattle();
         return;
       }
@@ -3573,7 +3757,7 @@
       );
       removeHandCard(h.uid);
       battle.playerDiscard.push(h);
-      pushLog(`「${def.name}」：获得 ${def.value} 点圣水。`);
+      pushLog(tm("gain_hw", { name: def.name, n: def.value }));
       pendingEffect = null;
       pendingRecallSlotIndex = null;
       selectedHandUid = null;
@@ -3582,14 +3766,12 @@
     } else if (def.effect === "draw_cards") {
       const dc = holyWaterCost(def);
       if (battle.playerHolyWater < dc) {
-        pushLog(
-          `圣水不足：需要 ${dc} 点圣水（当前 ${battle.playerHolyWater}）。`
-        );
+        pushLog(tm("hw_need", { need: dc, cur: battle.playerHolyWater }));
         renderBattle();
         return;
       }
       if (!battle.playerDeck.length) {
-        pushLog("牌库已空，无法使用「招募」。");
+        pushLog(tm("recruit_empty"));
         renderBattle();
         return;
       }
@@ -3602,7 +3784,7 @@
       }
       removeHandCard(h.uid);
       battle.playerDiscard.push(h);
-      pushLog(`「${def.name}」：抽取 ${n} 张牌。`);
+      pushLog(tm("draw_n", { name: def.name, n }));
       pendingEffect = null;
       pendingRecallSlotIndex = null;
       selectedHandUid = null;
@@ -3610,15 +3792,13 @@
       return;
     } else if (def.effect === "heal_all_full") {
       if (livingPlayerSlots().length === 0) {
-        pushLog("场上没有己方角色，无法使用「圣光」。");
+        pushLog(tm("holy_light_none"));
         renderBattle();
         return;
       }
       const cost = holyWaterCost(def);
       if (battle.playerHolyWater < cost) {
-        pushLog(
-          `圣水不足：「${def.name}」需要 ${cost} 点圣水（当前 ${battle.playerHolyWater}）。`
-        );
+        pushLog(tm("hw_need_named", { name: def.name, need: cost, cur: battle.playerHolyWater }));
         renderBattle();
         return;
       }
@@ -3635,7 +3815,7 @@
       }
       removeHandCard(h.uid);
       battle.playerDiscard.push(h);
-      pushLog(`「${def.name}」：${healed} 名己方角色已恢复至满血。`);
+      pushLog(tm("holy_light_done", { name: def.name, n: healed }));
       pendingEffect = null;
       pendingRecallSlotIndex = null;
       selectedHandUid = null;
@@ -3644,9 +3824,7 @@
     } else if (def.effect === "skip") {
       const cost = holyWaterCost(def);
       if (battle.playerHolyWater < cost) {
-        pushLog(
-          `圣水不足：时间停滞需要 ${cost} 点圣水（当前 ${battle.playerHolyWater}）。`
-        );
+        pushLog(tm("hw_need_skip", { need: cost, cur: battle.playerHolyWater }));
         renderBattle();
         return;
       }
@@ -3655,7 +3833,7 @@
       battle.skipEnemyNext = true;
       removeHandCard(h.uid);
       battle.playerDiscard.push(h);
-      pushLog("已使用时间停滞：敌方下一回合将被跳过。");
+      pushLog(tm("time_stop_used"));
       pendingEffect = null;
       pendingRecallSlotIndex = null;
       selectedHandUid = null;
@@ -3663,15 +3841,13 @@
       return;
     } else if (def.effect === "damage") {
       if (battle.playerHolyWater < holyWaterCost(def)) {
-        pushLog(
-          `圣水不足：需要 ${holyWaterCost(def)} 点圣水（当前 ${battle.playerHolyWater}）。`
-        );
+        pushLog(tm("hw_need", { need: holyWaterCost(def), cur: battle.playerHolyWater }));
         renderBattle();
         return;
       }
       pendingRecallSlotIndex = null;
       pendingEffect = { type: "damage", card: h, value: def.value };
-      pushLog("请选择一名敌方场上的角色造成伤害。");
+      pushLog(tm("pick_bolt"));
     }
     selectedHandUid = null;
     pendingRecallSlotIndex = null;
@@ -3686,7 +3862,7 @@
     const d = getChar(h.templateId);
     const cost = holyWaterCost(d);
     if (battle.playerHolyWater < cost) {
-      pushLog(`圣水不足，无法结算「${d.name}」。`);
+      pushLog(tm("hw_resolve_fail", { name: d.name }));
       return;
     }
     battle.playerHolyWater -= cost;
@@ -3698,13 +3874,15 @@
       const g = hadPoison ? base : healGainAfterPoison(c, base);
       c.hp = Math.min(c.maxHp, c.hp + g);
       pushLog(
-        hadPoison
-          ? `「${c.name}」回复 ${g} 点生命，中毒已解除。`
-          : `「${c.name}」回复 ${g} 点生命。`
+        tm("heal_done", {
+          name: c.name,
+          n: g,
+          cleared: hadPoison ? tm("poison_cleared") : "",
+        })
       );
     } else if (pendingEffect.type === "buff") {
       c.bonusDamage = (c.bonusDamage || 0) + pendingEffect.value;
-      pushLog(`「${c.name}」下次攻击额外 ${pendingEffect.value} 点伤害。`);
+      pushLog(t("bonus_next_named", { name: c.name, n: pendingEffect.value }));
     }
     removeHandCard(h.uid);
     battle.playerDiscard.push(h);
@@ -3721,7 +3899,7 @@
     const d = getChar(h.templateId);
     const cost = holyWaterCost(d);
     if (battle.playerHolyWater < cost) {
-      pushLog(`圣水不足，无法结算「${d.name}」。`);
+      pushLog(tm("hw_resolve_fail", { name: d.name }));
       return;
     }
     battle.playerHolyWater -= cost;
@@ -3757,7 +3935,7 @@
       recalledFromBoard: true,
     });
     battle.playerBoard[slotIndex] = null;
-    pushLog(`「${prev.name}」已下阵（生命 ${prev.hp}/${prev.maxHp}）。`);
+    pushLog(tm("recalled", { name: prev.name, hp: prev.hp, max: prev.maxHp }));
     renderBattle();
   }
 
@@ -3798,7 +3976,7 @@
           const rFrom = elFrom ? elFrom.getBoundingClientRect() : null;
           const rEnd = elTo ? elTo.getBoundingClientRect() : null;
           pendingRecallSlotIndex = null;
-          pushLog(`「${mover.name}」已移至空位。`);
+          pushLog(tm("moved_empty", { name: mover.name }));
           if (rFrom && rEnd) {
             await flyHandCardFromRectToRect(rFrom, rEnd, {
               uid: "mv",
@@ -3817,7 +3995,7 @@
         const cA = battle.playerBoard[from];
         const cB = battle.playerBoard[slotIndex];
         pendingRecallSlotIndex = null;
-        pushLog(`「${mover.name}」与「${prev.name}」交换位置。`);
+        pushLog(tm("swapped_pos", { a: mover.name, b: prev.name }));
         if (rA && rB) {
           await Promise.all([
             flyHandCardFromRectToRect(rA, rB, {
@@ -3849,7 +4027,7 @@
 
     if (isTier2HeroDef(def)) {
       if (battle.phase === "setup") {
-        pushLog("布阵阶段无法使用二级英雄（请仅摆放一级英雄）。");
+        pushLog(tm("no_t2_setup"));
         renderBattle();
         return;
       }
@@ -3861,7 +4039,12 @@
       if (canUpgrade) {
         const upCost = def.upgradeHolyWaterCost || 0;
         if (battle.playerHolyWater < upCost) {
-          pushLog(`圣水不足：升级需要 ${upCost} 点（当前 ${battle.playerHolyWater}）。`);
+          pushLog(
+            tm("hw_need_upgrade", {
+              need: upCost,
+              cur: battle.playerHolyWater,
+            })
+          );
           renderBattle();
           return;
         }
@@ -3884,7 +4067,14 @@
         battle.playerBoard[slotIndex] = upgradedP;
         removeHandCard(h.uid);
         battle.playerDiscard.push(h);
-        pushLog(`「${getChar(def.upgradesFrom).name}」已升级为「${def.name}」（生命 ${newHp}/${def.hp}）。`);
+        pushLog(
+          tm("upgraded", {
+            from: getChar(def.upgradesFrom).name,
+            to: def.name,
+            hp: newHp,
+            max: def.hp,
+          })
+        );
         selectedHandUid = null;
         renderBattle();
         requestAnimationFrame(() => {
@@ -3894,30 +4084,24 @@
       }
       if (prev && prev.hp > 0 && prev.templateId !== def.upgradesFrom) {
         const fromDef = getChar(def.upgradesFrom);
-        pushLog(
-          `「${def.name}」只能升级场上的「${fromDef ? fromDef.name : "对应一级"}」。`
-        );
+        pushLog(tm("upgrade_only", { name: def.name, from: fromDef ? fromDef.name : t("t1_fallback") }));
         renderBattle();
         return;
       }
       if (!prev || prev.hp <= 0) {
         if (!h.recalledFromBoard) {
-          pushLog(
-            `「${def.name}」须升级场上对应的一级；从场上「下阵」回手牌的二级可再置于空位。`
-          );
+          pushLog(tm("upgrade_or_recall", { name: def.name }));
           renderBattle();
           return;
         }
         if (battle.phase !== "player") {
-          pushLog("当前阶段无法将二级英雄置于空位。");
+          pushLog(tm("no_t2_empty"));
           renderBattle();
           return;
         }
         const rw = recruitHolyWaterCost(def);
         if (rw > 0 && battle.playerHolyWater < rw) {
-          pushLog(
-            `圣水不足：上场「${def.name}」需要 ${rw} 点（当前 ${battle.playerHolyWater}）。`
-          );
+          pushLog(tm("hw_need_deploy", { name: def.name, need: rw, cur: battle.playerHolyWater }));
           renderBattle();
           return;
         }
@@ -3936,12 +4120,12 @@
         attachHolyPriestReactiveFields(redeploy, h.templateId);
         battle.playerBoard[slotIndex] = redeploy;
         removeHandCard(h.uid);
-        pushLog(`「${def.name}」上场。`);
+        pushLog(tm("deployed", { name: def.name }));
         selectedHandUid = null;
         renderBattle();
         return;
       }
-      pushLog("无法将二级英雄置于该格。");
+      pushLog(tm("t2_bad_slot"));
       renderBattle();
       return;
     }
@@ -3949,9 +4133,7 @@
     const rw = recruitHolyWaterCost(def);
     if (battle.phase === "player" && rw > 0) {
       if (battle.playerHolyWater < rw) {
-        pushLog(
-          `圣水不足：上场「${def.name}」需要 ${rw} 点（当前 ${battle.playerHolyWater}）。`
-        );
+        pushLog(tm("hw_need_deploy", { name: def.name, need: rw, cur: battle.playerHolyWater }));
         renderBattle();
         return;
       }
@@ -3997,11 +4179,9 @@
         maxHp: prev.maxHp,
         recalledFromBoard: true,
       });
-      pushLog(
-        `换下「${prev.name}」（${prev.hp}/${prev.maxHp}），换上「${def.name}」（${hpFromHand}/${maxHp}）。`
-      );
+      pushLog(tm("replaced", { old: prev.name, ohp: prev.hp, omax: prev.maxHp, new: def.name, nhp: hpFromHand, nmax: maxHp }));
     } else {
-      pushLog(`「${def.name}」上场。`);
+      pushLog(tm("deployed", { name: def.name }));
     }
     selectedHandUid = null;
     renderBattle();
@@ -4051,7 +4231,7 @@
   function playerSurrender() {
     closeSurrenderConfirm();
     if (!battle || battle.phase === "over") return;
-    pushLog("你选择投降。");
+    pushLog(t("surrendered"));
     endGame(false, { surrender: true });
   }
 
@@ -4135,5 +4315,14 @@
     true
   );
 
+  const btnLang = document.getElementById("btn-lang");
+  if (btnLang) {
+    btnLang.addEventListener("click", () => {
+      if (typeof GameI18n !== "undefined") GameI18n.toggleLang();
+      refreshLanguageUi();
+    });
+  }
+
+  applyStaticI18n();
   renderDeckBuilder();
 })();

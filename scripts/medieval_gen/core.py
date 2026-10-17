@@ -359,11 +359,29 @@ def draw_effect_icon(base: Image.Image, kind: str, primary: tuple[int, int, int]
         pts = [(cx - 34 * scale, cy - 192 * scale), (cx + 18 * scale, cy - 88 * scale), (cx - 10 * scale, cy - 86 * scale), (cx + 72 * scale, cy + 84 * scale), (cx + 10 * scale, cy + 80 * scale), (cx + 38 * scale, cy + 198 * scale), (cx - 82 * scale, cy + 24 * scale), (cx - 20 * scale, cy + 28 * scale)]
         draw.polygon(pts, fill=(*accent, 245))
     elif kind == "ganyu":
-        draw.ellipse([cx - 134 * scale, cy - 60 * scale, cx + 134 * scale, cy + 46 * scale], fill=(*primary, 210))
-        for offset in (-92, -44, 6, 56, 108):
-            draw.line([(cx + offset * scale, cy + 18 * scale), (cx + (offset - 18) * scale, cy + 160 * scale)], fill=(*accent, 235), width=max(4, int(7 * scale)))
-        draw.ellipse([cx - 102 * scale, cy - 20 * scale, cx - 14 * scale, cy + 72 * scale], fill=(*primary, 220))
-        draw.ellipse([cx - 28 * scale, cy - 58 * scale, cx + 82 * scale, cy + 62 * scale], fill=(*primary, 220))
+        # Purple elixir potion bottle
+        bottle = (118, 72, 168)
+        liquid = (168, 92, 220)
+        glass = (210, 190, 230)
+        draw.ellipse([cx - 54 * scale, cy + 78 * scale, cx + 54 * scale, cy + 118 * scale], fill=(*tint(bottle, -20), 230))
+        draw.rounded_rectangle(
+            [cx - 48 * scale, cy - 40 * scale, cx + 48 * scale, cy + 96 * scale],
+            radius=int(28 * scale),
+            fill=(*bottle, 235),
+        )
+        draw.rounded_rectangle(
+            [cx - 40 * scale, cy - 10 * scale, cx + 40 * scale, cy + 86 * scale],
+            radius=int(22 * scale),
+            fill=(*liquid, 235),
+        )
+        draw.rectangle([cx - 18 * scale, cy - 88 * scale, cx + 18 * scale, cy - 34 * scale], fill=(*glass, 230))
+        draw.ellipse([cx - 26 * scale, cy - 108 * scale, cx + 26 * scale, cy - 72 * scale], fill=(120, 78, 48, 255))
+        draw.ellipse([cx - 16 * scale, cy - 20 * scale, cx - 2 * scale, cy + 8 * scale], fill=(245, 230, 255, 110))
+        for ox, oy, rr in [(-70, -30, 10), (78, 12, 8), (-86, 40, 7), (90, -50, 9)]:
+            draw.ellipse(
+                [cx + ox * scale - rr * scale, cy + oy * scale - rr * scale, cx + ox * scale + rr * scale, cy + oy * scale + rr * scale],
+                fill=(*accent, 120),
+            )
     elif kind == "recruit":
         draw.rectangle([cx - 118 * scale, cy - 136 * scale, cx + 64 * scale, cy + 118 * scale], fill=(*primary, 230))
         draw.line([(cx - 92 * scale, cy - 90 * scale), (cx + 24 * scale, cy - 90 * scale)], fill=(*tint(primary, -54), 220), width=max(3, int(5 * scale)))

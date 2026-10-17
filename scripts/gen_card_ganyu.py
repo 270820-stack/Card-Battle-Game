@@ -10,4 +10,14 @@ from medieval_gen.core import ensure_assets_dir, render_card
 
 if __name__ == "__main__":
     ensure_assets_dir()
-    render_card("card-ganyu.png", "chapel", (92, 100, 112), (22, 24, 34), (172, 204, 232), "effect", 122, effect="ganyu", primary=(120, 132, 146))
+    render_card(
+        "card-ganyu.png",
+        "chapel",
+        (78, 48, 96),
+        (22, 14, 28),
+        (186, 120, 230),
+        "effect",
+        122,
+        effect="ganyu",
+        primary=(118, 72, 168),
+    )
