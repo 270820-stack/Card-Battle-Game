@@ -3,22 +3,75 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>四格对决 · 卡牌构筑</title>
+  <title>坠冕纪元 · 卡牌构筑</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="icon" href="assets/crownfall-crest.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <button type="button" id="btn-lang" class="lang-toggle" aria-label="Language">ENG</button>
+  <div class="top-controls">
+    <button type="button" id="btn-lang" class="btn secondary medieval-button" aria-label="Switch to English">ENG</button>
+    <button type="button" id="btn-surrender" class="btn secondary medieval-button" disabled>投降</button>
+  </div>
 
   <div id="app">
     <header class="top-bar">
-      <h1>四格对决</h1>
+      <h1>坠冕纪元</h1>
       <p class="subtitle">人机（AI）1v1 · 初始仅可布阵角色 · 掷硬币先后手 · 共用 20 张构筑（独立洗牌）</p>
     </header>
 
-    <section id="screen-deck" class="screen active">
+    <section id="screen-menu" class="screen active" aria-labelledby="menu-title">
+      <img class="menu-guide" src="assets/royal-tactician.webp" alt="" fetchpriority="high" />
+      <div class="menu-content">
+        <img class="menu-crest" src="assets/crownfall-crest.svg" alt="" />
+        <h1 id="menu-title" data-ui="brand">坠冕纪元</h1>
+        <p class="menu-kicker" data-ui="menu_kicker">中世纪卡牌对决</p>
+        <nav class="menu-actions">
+          <button type="button" id="btn-one-on-one" class="btn primary" data-ui="menu_duel">1v1</button>
+          <button type="button" id="btn-versus-bot" class="btn primary" data-ui="menu_bot">人机对战</button>
+          <button type="button" id="btn-view-cards" class="btn secondary" data-ui="menu_cards">查看卡牌</button>
+          <button type="button" id="btn-tutorial" class="btn secondary" data-ui="tutorial">教程</button>
+        </nav>
+      </div>
+    </section>
+
+    <section id="screen-tutorial" class="screen" aria-labelledby="tutorial-title">
+      <button type="button" id="btn-tutorial-menu" class="btn secondary medieval-button screen-back" data-ui="menu_back">主菜单</button>
+      <div class="tutorial-stage">
+        <img class="tutorial-guide" src="assets/royal-tactician.webp" alt="" />
+        <div class="tutorial-dialogue deck-panel">
+          <p id="tutorial-progress" class="tutorial-progress"></p>
+          <p class="tutorial-speaker" data-ui="tutorial_speaker">王国公主</p>
+          <div aria-live="polite" aria-atomic="true">
+            <h2 id="tutorial-title" tabindex="-1"></h2>
+            <p id="tutorial-line"></p>
+          </div>
+          <figure class="tutorial-example">
+            <a id="tutorial-example-link" target="_blank" rel="noopener">
+              <img id="tutorial-example-image" alt="" />
+              <span class="tutorial-example-open" data-ui="tutorial_open_image">查看原图（在新标签页打开）</span>
+            </a>
+          </figure>
+          <div class="tutorial-actions">
+            <button type="button" id="btn-tutorial-prev" class="btn secondary medieval-button" data-ui="tutorial_prev">上一步</button>
+            <button type="button" id="btn-tutorial-next" class="btn primary medieval-button">下一步</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-cards" class="screen" aria-labelledby="cards-title">
+      <button type="button" id="btn-cards-menu" class="btn secondary screen-back" data-ui="menu_back">主菜单</button>
+      <div class="deck-panel">
+        <h2 id="cards-title" data-ui="cards_title">卡牌图鉴</h2>
+        <div id="catalog-grid" class="card-grid"></div>
+      </div>
+    </section>
+
+    <section id="screen-deck" class="screen">
+      <button type="button" id="btn-deck-menu" class="btn secondary screen-back" data-ui="menu_back">主菜单</button>
       <div class="deck-panel">
         <h2>构筑卡组（已选 <span id="deck-count">0</span> / 20）</h2>
         <p id="deck-hint" class="deck-hint" aria-live="polite"></p>
@@ -28,7 +81,7 @@
         </div>
         <div id="pool-grid" class="card-grid"></div>
       </div>
-      <div class="deck-panel">
+      <div class="deck-panel deck-roster">
         <h2>当前携带</h2>
         <div id="carried-list" class="carried-list"></div>
         <button type="button" id="btn-start-battle" class="btn primary" disabled>开始对战</button>
@@ -64,12 +117,8 @@
 
         <div class="battle-bottom-left-actions">
           <div class="turn-actions">
-            <button type="button" id="btn-confirm" class="btn primary">确认结束回合</button>
+            <button type="button" id="btn-confirm" class="btn primary medieval-button">确认结束回合</button>
           </div>
-        </div>
-
-        <div class="battle-top-right-actions">
-          <button type="button" id="btn-surrender" class="btn secondary surrender" disabled>投降</button>
         </div>
 
         <div class="battle-main-stage">
@@ -103,6 +152,7 @@
       <div class="over-box">
         <h2 id="over-title">对局结束</h2>
         <p id="over-msg"></p>
+        <button type="button" id="btn-over-menu" class="btn secondary" data-ui="menu_back">主菜单</button>
         <button type="button" id="btn-back-deck" class="btn primary">返回构筑</button>
       </div>
     </section>
@@ -121,8 +171,8 @@
     <div class="confirm-box" role="dialog" aria-modal="true" aria-labelledby="surrender-dialog-title">
       <p id="surrender-dialog-title" class="confirm-title">确认投降？</p>
       <div class="confirm-actions">
-        <button type="button" id="btn-surrender-cancel" class="btn secondary">取消</button>
-        <button type="button" id="btn-surrender-ok" class="btn primary confirm-danger">确认</button>
+        <button type="button" id="btn-surrender-cancel" class="btn secondary medieval-button">取消</button>
+        <button type="button" id="btn-surrender-ok" class="btn primary medieval-button">确认</button>
       </div>
     </div>
   </div>
@@ -155,6 +205,7 @@
 
   <script src="i18n.js"></script>
   <script src="sfx.js"></script>
+  <script src="battle-fx.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

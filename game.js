@@ -11,6 +11,11 @@
     }
   }
 
+  function playCardCue(id, side, slot) {
+    BattleFX.burst(id, BattleFX.point(side, slot));
+    playSfx("cardCue", id);
+  }
+
   const CARD_POOL = {
     warrior: {
       type: "character",
@@ -53,9 +58,9 @@
       damage: 6,
       targetRule: "highest_hp",
       passive: "shadowAssassinBlood",
-      skill: "刺杀 6：攻击当前生命最高的敌方；同血优先右侧",
+      skill: "影刃：攻击当前生命最高的敌方；同血优先右侧",
       passiveDesc:
-        "被动·影刃：目标剩余生命超过 50%、75%、满血时，额外造成 3、5、7 点真实伤害（取最高档，不叠加）",
+        "被动·影刃：造成目标当前生命 30% 的伤害，最低 6 点",
     },
     guardian: {
       type: "character",
@@ -82,7 +87,7 @@
       passive: "youngDragonHw",
       skill:
         "龙息 1：优先攻击正前方；若该格无角色则攻击最近一列，同距离优先右侧",
-      passiveDesc: "被动·蓄能：每次发动攻击后获得 1 灵药",
+      passiveDesc: "被动·蓄能：每次发动攻击后获得 1 圣水",
     },
     priest: {
       type: "character",
@@ -106,7 +111,7 @@
       skill:
         "龙焰 1：优先攻击正前方；若该格无角色则攻击最近一列，同距离优先右侧",
       passiveDesc:
-        "被动·血怒：造成伤害等于自身已损失生命（至少为 1）；若击杀目标可再发动一次相同攻击（消耗 3 灵药）",
+        "被动·血怒：造成伤害等于自身已损失生命（至少为 1）；若击杀目标可再发动一次相同攻击（消耗 3 圣水）",
     },
     mirror_mage: {
       type: "character",
@@ -133,7 +138,7 @@
       passive: "poisonOnHit",
       skill: "毒咒 7：随机一名敌方，7 点真实伤害并施加中毒",
       passiveDesc:
-        "被动·毒咒：攻击为真实伤害；目标中毒（一回合）：治疗效力-80%，受击额外 +1",
+        "被动·毒咒：攻击为真实伤害；目标中毒（一回合）：治疗效力-80%，受击额外 +3",
     },
     poison_assassin: {
       type: "character",
@@ -147,7 +152,7 @@
       passive: "poisonOnHit",
       skill: "毒刺 8：攻击生命最高敌方并施加中毒",
       passiveDesc:
-        "被动·毒刃：目标中毒（一回合）：治疗效力-80%，受击额外 +1",
+        "被动·毒刃：目标中毒（一回合）：治疗效力-80%，受击额外 +3",
     },
     round_table_guardian: {
       type: "character",
@@ -155,14 +160,14 @@
       upgradesFrom: "warrior",
       upgradeHolyWaterCost: 10,
       name: "圆桌守卫",
-      hp: 45,
+      hp: 40,
       damage: 3,
       targetRule: "front_nearest_right",
       passive: "roundTableDamageReduction",
       skill:
         "盾击 3：优先攻击正前方；若该格无角色则攻击最近一列，同距离优先右侧",
       passiveDesc:
-        "被动·圆桌：己方全体受到的伤害降低；场上 1/2/3/4 名圆桌守卫时分别为 30%/50%/70%/90%（单次受伤至少 1）",
+        "被动·圆桌：己方全体受到的伤害降低；场上 1/2/3/4 名圆桌守卫时分别为 20%/30%/50%/70%（单次受伤至少 1）",
     },
     berserker: {
       type: "character",
@@ -227,48 +232,48 @@
     heal: {
       type: "effect",
       name: "治疗术",
-      desc: "消耗 1 点灵药。使一名己方角色回复 6 点生命",
+      desc: "消耗 1 点圣水。使一名己方角色回复 6 点生命",
       effect: "heal",
       value: 6,
     },
     buff: {
       type: "effect",
       name: "战意",
-      desc: "消耗 1 点灵药。使一名己方角色下次攻击额外造成 3 点伤害",
+      desc: "消耗 1 点圣水。使一名己方角色下次攻击额外造成 3 点伤害",
       effect: "buff",
       value: 3,
     },
     skip: {
       type: "effect",
       name: "时间停滞",
-      desc: "消耗 3 点灵药。跳过敌方下一个回合（其无法出牌与攻击）",
+      desc: "消耗 3 点圣水。跳过敌方下一个回合（其无法出牌与攻击）",
       effect: "skip",
     },
     bolt: {
       type: "effect",
       name: "闪电",
-      desc: "消耗 1 点灵药。对一名敌方角色造成 2 点伤害",
+      desc: "消耗 1 点圣水。对一名敌方角色造成 2 点伤害",
       effect: "damage",
       value: 2,
     },
     ganyu: {
       type: "effect",
-      name: "灵药",
-      desc: "获得 2 点灵药。",
+      name: "甘雨",
+      desc: "获得 2 点圣水。",
       effect: "gain_holy_water",
       value: 2,
     },
     recruit: {
       type: "effect",
       name: "招募",
-      desc: "消耗 1 点灵药。从牌库抽取 2 张牌。",
+      desc: "消耗 1 点圣水。从牌库抽取 2 张牌。",
       effect: "draw_cards",
       value: 2,
     },
     holy_light: {
       type: "effect",
       name: "圣光",
-      desc: "消耗 4 点灵药。将我方场上所有角色恢复至满血。",
+      desc: "消耗 4 点圣水。将我方场上所有角色恢复至满血。",
       effect: "heal_all_full",
     },
   };
@@ -340,6 +345,9 @@
         ? "en"
         : "zh-CN";
     document.title = t("title");
+    document.querySelectorAll("[data-ui]").forEach((node) => {
+      node.textContent = t(node.dataset.ui);
+    });
     const brand = document.querySelector(".top-bar h1");
     if (brand) brand.textContent = t("brand");
     const sub = document.querySelector(".top-bar .subtitle");
@@ -406,6 +414,7 @@
       const isEn =
         typeof GameI18n !== "undefined" && GameI18n.getLang() === "en";
       langBtn.textContent = isEn ? t("lang_to_zh") : t("lang_to_en");
+      langBtn.setAttribute("aria-label", t("lang_switch"));
     }
   }
   function refreshLanguageUi() {
@@ -415,6 +424,8 @@
     if (deckScreen && deckScreen.classList.contains("active")) {
       renderDeckBuilder();
     }
+    if (document.querySelector("#screen-cards.active")) renderCatalog();
+    if (document.querySelector("#screen-tutorial.active")) renderTutorial();
     if (battle) {
       updateTurnCounter();
       updateHolyWaterPanel();
@@ -515,7 +526,7 @@
     const n = Math.max(1, turns | 0);
     victim.poison = {
       healMul: 0.2,
-      extraOnHit: 1,
+      extraOnHit: 3,
       turnsLeft: n,
       clearAfterPlayerPhase: victimIsOnPlayerBoard,
       clearAfterEnemyPhase: !victimIsOnPlayerBoard,
@@ -713,6 +724,7 @@
     document.querySelectorAll(".screen").forEach((s) => {
       s.classList.toggle("active", s.id === id);
     });
+    window.scrollTo(0, 0);
     if (id !== "screen-battle") {
       const sur = document.getElementById("btn-surrender");
       if (sur) sur.disabled = true;
@@ -871,6 +883,7 @@
       const killed = !battle.enemyBoard[target];
       if (hit === 0) {
         if (killed && battle.playerHolyWater >= RAGE_DRAGON_FOLLOWUP_COST) {
+          playCardCue("rage_dragon", "player", slotIndex);
           battle.playerHolyWater -= RAGE_DRAGON_FOLLOWUP_COST;
           pushLog(
             tm("rage_again_you", {
@@ -914,6 +927,7 @@
       const killed = !battle.playerBoard[target];
       if (hit === 0) {
         if (killed && battle.enemyHolyWater >= RAGE_DRAGON_FOLLOWUP_COST) {
+          playCardCue("rage_dragon", "enemy", slotIndex);
           battle.enemyHolyWater -= RAGE_DRAGON_FOLLOWUP_COST;
           pushLog(
             tm("rage_again_enemy", {
@@ -1002,13 +1016,10 @@
     return hpRatio(target) >= 0.5 ? 2 : 0;
   }
 
-  /** 取最高档：满血 7，>75% 为 5，>50% 为 3。 */
-  function shadowAssassinTrueBonusFromTarget(target) {
-    const r = hpRatio(target);
-    if (r >= 1) return 7;
-    if (r > 0.75) return 5;
-    if (r > 0.5) return 3;
-    return 0;
+  /** 暗影刺客：目标当前生命的 30%，最低 6。 */
+  function shadowAssassinDamageFromTarget(target) {
+    const hp = target && target.hp > 0 ? target.hp : 0;
+    return Math.max(6, Math.floor(hp * 0.3));
   }
 
   async function dealAssassinSingleHit(
@@ -1024,9 +1035,13 @@
     const t = targetBoard[targetSlot];
     if (!t || t.hp <= 0) return;
     let trueBonus = 0;
+    let hitDmg = baseDmg;
     if (tid === "assassin") trueBonus = assassinTier1TrueBonusFromTarget(t);
-    else if (tid === "shadow_assassin")
-      trueBonus = shadowAssassinTrueBonusFromTarget(t);
+    else if (tid === "shadow_assassin") {
+      const cardDmg = getChar(tid).damage || 0;
+      const bonus = Math.max(0, baseDmg - cardDmg);
+      hitDmg = shadowAssassinDamageFromTarget(t) + bonus;
+    }
 
     await playAttackVfx(
       tid,
@@ -1034,24 +1049,26 @@
       attackerSlot,
       toSide,
       targetSlot,
-      baseDmg + trueBonus
+      hitDmg + trueBonus
     );
     if (playerVictim) {
-      await dealDamageToPlayerSlot(targetSlot, baseDmg, false);
+      await dealDamageToPlayerSlot(targetSlot, hitDmg, false);
       await removeDead(battle.playerBoard, false);
       if (trueBonus > 0) {
         const t2 = battle.playerBoard[targetSlot];
         if (t2 && t2.hp > 0) {
+          playCardCue("assassin", "player", targetSlot);
           await dealDamageToPlayerSlot(targetSlot, trueBonus, true);
           await removeDead(battle.playerBoard, false);
         }
       }
     } else {
-      await dealDamageToEnemySlot(targetSlot, baseDmg, false);
+      await dealDamageToEnemySlot(targetSlot, hitDmg, false);
       await removeDead(battle.enemyBoard, true);
       if (trueBonus > 0) {
         const t2 = battle.enemyBoard[targetSlot];
         if (t2 && t2.hp > 0) {
+          playCardCue("assassin", "enemy", targetSlot);
           await dealDamageToEnemySlot(targetSlot, trueBonus, true);
           await removeDead(battle.enemyBoard, true);
         }
@@ -1194,6 +1211,8 @@
       if (c.hp >= enemy.hp) continue;
       const hpA = c.hp;
       const hpB = enemy.hp;
+      playCardCue("dark_priest", isPlayerTurn ? "player" : "enemy", i);
+      BattleFX.burst("dark_priest", BattleFX.point(isPlayerTurn ? "enemy" : "player", best));
       c.hp = Math.min(c.maxHp, hpB);
       enemy.hp = Math.min(enemy.maxHp, hpA);
       pushLog(
@@ -1226,6 +1245,7 @@
         if (hp.holyPriestReactiveLeft == null) hp.holyPriestReactiveLeft = 4;
         if (hp.holyPriestReactiveLeft <= 0) continue;
         hp.holyPriestReactiveLeft--;
+        playCardCue("holy_priest", board === battle.playerBoard ? "player" : "enemy", slot);
         const hg = healGainAfterPoison(victim, 2);
         victim.hp = Math.min(victim.maxHp, victim.hp + hg);
         pushLog(
@@ -1242,7 +1262,7 @@
   }
 
   /** 圆桌守卫数量（1～4）→ 全队伤害减免比例。 */
-  const ROUND_TABLE_DR_BY_COUNT = [0, 0.3, 0.5, 0.7, 0.9];
+  const ROUND_TABLE_DR_BY_COUNT = [0, 0.2, 0.3, 0.5, 0.7];
 
   /** @param {boolean} [trueDamage] 真实伤害：不吃圆桌护佑与一级守卫分担（如刺客被动追加）。 */
   function applyDamageWithShare(board, targetSlot, amount, victimIsPlayer, trueDamage) {
@@ -1254,6 +1274,7 @@
       incoming += c.poison.extraOnHit;
     }
 
+    const side = victimIsPlayer ? "player" : "enemy";
     let effectiveAmount = incoming;
     let rtCount = 0;
 
@@ -1265,6 +1286,7 @@
         const mult = Math.max(0, 1 - rate);
         effectiveAmount = Math.floor(incoming * mult + 1e-9);
         if (effectiveAmount < 1) effectiveAmount = 1;
+        if (effectiveAmount < incoming) playCardCue("round_table_guardian", side, targetSlot);
       }
 
       const warriorSlots = findShareDamageWarriorSlots(board);
@@ -1276,6 +1298,7 @@
           if (prot !== targetSlot || gs === targetSlot) continue;
           const half = (effectiveAmount / 2) | 0;
           const rest = effectiveAmount - half;
+          if (half > 0) playCardCue("warrior", side, gs);
           board[gs].hp -= half;
           c.hp -= rest;
           const sName = board[gs].name;
@@ -1354,6 +1377,7 @@
         const extra = c.bonusDamage || 0;
         c.bonusDamage = 0;
         const dmg = c.damage + extra;
+        playCardCue("mirror_mage", fromSide, slot);
         await delay(280);
         await playAttackVfx(c.templateId, fromSide, slot, toSide, target, dmg);
         pushLog(
@@ -1465,6 +1489,7 @@
     vid.play().catch(function () {
       /* 自动播放被拦截时仍保留 CSS 层 */
     });
+    BattleFX.burst(tid, { x: cx, y: cy }, "upgrade");
     playSfx("tier2UpgradeReveal");
     window.setTimeout(() => {
       wrap.remove();
@@ -1696,21 +1721,37 @@
     });
   }
 
-  function vfxOrbFly(x1, y1, x2, y2) {
+  function mageBurstVariant(templateId) {
+    if (templateId === "poison_witch") return "poison";
+    if (templateId === "mirror_mage") return "mirror";
+    return "arcane";
+  }
+
+  function vfxMageSeries(x1, y1, x2, y2, templateId) {
     return new Promise((resolve) => {
-      const o = el("div", "fx-orb");
-      o.style.left = x1 + "px";
-      o.style.top = y1 + "px";
-      o.style.setProperty("--tx", x2 - x1 + "px");
-      o.style.setProperty("--ty", y2 - y1 + "px");
+      const variant = mageBurstVariant(templateId);
+      const bolt = el("div", "fx-mage-bolt fx-mage-bolt--" + variant);
+      bolt.style.left = x1 + "px";
+      bolt.style.top = y1 + "px";
+      bolt.style.setProperty("--tx", x2 - x1 + "px");
+      bolt.style.setProperty("--ty", y2 - y1 + "px");
       const layer = getFxLayer();
-      if (layer) layer.appendChild(o);
-      else document.body.appendChild(o);
-      requestAnimationFrame(() => o.classList.add("fx-orb--moving"));
+      if (layer) layer.appendChild(bolt);
+      else document.body.appendChild(bolt);
+      requestAnimationFrame(() => bolt.classList.add("fx-mage-bolt--moving"));
       setTimeout(() => {
-        o.remove();
-        resolve();
-      }, 720);
+        bolt.remove();
+        const burst = el("div", "fx-mage-burst fx-mage-burst--" + variant);
+        burst.setAttribute("aria-hidden", "true");
+        burst.style.left = x2 + "px";
+        burst.style.top = y2 + "px";
+        if (layer) layer.appendChild(burst);
+        else document.body.appendChild(burst);
+        setTimeout(() => {
+          burst.remove();
+          resolve();
+        }, 720);
+      }, 420);
     });
   }
 
@@ -1775,7 +1816,9 @@
     const r2 = toEl.getBoundingClientRect();
     const x2 = r2.left + r2.width / 2;
     const y2 = r2.top + r2.height / 2;
+    playSfx("cardCue", "bolt");
     await vfxLightningStrikeInstant(x2, y2);
+    BattleFX.burst("bolt", { x: x2, y: y2 });
     playHitImpact(toSide, toSlot, x2, y2, damageAmount);
     await delay(120);
   }
@@ -1797,53 +1840,38 @@
     if (fromSide === "player") animPlayerSlot(fromSlot, "anim-attack");
     else animEnemySlot(fromSlot, "anim-attack");
 
-    if (templateId === "ranger" || templateId === "divine_archer")
-      await vfxArrowLine(x1, y1, x2, y2);
-    else if (
-      templateId === "mage" ||
-      templateId === "mirror_mage" ||
-      templateId === "poison_witch" ||
-      templateId === "poison_assassin" ||
-      templateId === "assassin" ||
-      templateId === "shadow_assassin"
-    )
-      await vfxOrbFly(x1, y1, x2, y2);
-    else if (templateId === "guardian" || templateId === "berserker")
+    playSfx("cardCue", templateId);
+    const source = { x: x1, y: y1 };
+    const target = { x: x2, y: y2 };
+    if (templateId === "ranger" || templateId === "divine_archer") {
+      await Promise.all([
+        vfxArrowLine(x1, y1, x2, y2),
+        BattleFX.travel(templateId, source, target),
+      ]);
+    } else if (["mage", "mirror_mage", "poison_witch"].includes(templateId)) {
+      await vfxMageSeries(x1, y1, x2, y2, templateId);
+    } else if (templateId === "guardian") {
       await vfxGuardianImpact(x2, y2);
-    else if (templateId === "rage_dragon" || templateId === "young_dragon")
-      await vfxOrbFly(x1, y1, x2, y2);
-    else if (
-      templateId === "priest" ||
-      templateId === "holy_priest" ||
-      templateId === "dark_priest"
-    )
-      await vfxOrbFly(x1, y1, x2, y2);
-    else await vfxWarriorCardLeap(r1, x1, y1, x2, y2);
+    } else if (templateId === "warrior" || templateId === "round_table_guardian") {
+      await vfxWarriorCardLeap(r1, x1, y1, x2, y2);
+    } else {
+      await BattleFX.travel(templateId, source, target);
+    }
 
+    BattleFX.burst(templateId, target);
     playHitImpact(toSide, toSlot, x2, y2, damageAmount);
     await delay(160);
   }
 
-  async function playHealVfx(fromSide, fromSlot, toSide, toSlot) {
-    const fromEl = document.getElementById(
-      `${fromSide === "player" ? "player" : "enemy"}-slot-${fromSlot}`
-    );
-    const toEl = document.getElementById(
-      `${toSide === "player" ? "player" : "enemy"}-slot-${toSlot}`
-    );
-    if (!fromEl || !toEl) {
-      await delay(400);
-      return;
-    }
-    const r1 = fromEl.getBoundingClientRect();
-    const r2 = toEl.getBoundingClientRect();
-    const x1 = r1.left + r1.width / 2;
-    const y1 = r1.top + r1.height / 2;
-    const x2 = r2.left + r2.width / 2;
-    const y2 = r2.top + r2.height / 2;
+  async function playHealVfx(fromSide, fromSlot, toSide, toSlot, templateId) {
+    const source = BattleFX.point(fromSide, fromSlot);
+    const target = BattleFX.point(toSide, toSlot);
+    if (!source || !target) return;
     if (fromSide === "player") animPlayerSlot(fromSlot, "anim-attack");
     else animEnemySlot(fromSlot, "anim-attack");
-    await vfxOrbFly(x1, y1, x2, y2);
+    playSfx("cardCue", templateId);
+    await BattleFX.travel(templateId, source, target);
+    BattleFX.burst(templateId, target);
     if (toSide === "player") animPlayerSlot(toSlot, "anim-effect");
     else animEnemySlot(toSlot, "anim-effect");
     playSfx("heal");
@@ -1933,6 +1961,10 @@
       );
       anim.onfinish = () => {
         clone.remove();
+        if (["skip", "ganyu", "recruit", "holy_light"].includes(h.templateId)) {
+          BattleFX.burst(h.templateId, { x: window.innerWidth / 2, y: window.innerHeight / 2 });
+          playSfx("cardCue", h.templateId);
+        }
         resolve();
       };
     });
@@ -2174,6 +2206,8 @@
             name: c.name,
           })
         );
+        BattleFX.defeat(c.templateId, isEnemy ? "enemy" : "player", i);
+        playSfx("unitDefeat");
         if (isEnemy) battle.enemyDefeatCount++;
         else battle.playerDefeatCount++;
         board[i] = null;
@@ -2231,7 +2265,7 @@
       if (!targets.length) return;
       const t = targets[0];
       const ally = board[t];
-      await playHealVfx("player", attSlot, "player", t);
+      await playHealVfx("player", attSlot, "player", t, tid);
       const g3 = healGainAfterPoison(ally, 3);
       ally.hp = Math.min(ally.maxHp, ally.hp + g3);
       pushLog(tm("heal_log", { a: att.name, b: ally.name, n: g3 }));
@@ -2249,7 +2283,7 @@
       for (const t of uniq) {
         const ally = board[t];
         if (!ally || ally.hp <= 0) continue;
-        await playHealVfx("player", attSlot, "player", t);
+        await playHealVfx("player", attSlot, "player", t, tid);
         const g6 = healGainAfterPoison(ally, 6);
         ally.hp = Math.min(ally.maxHp, ally.hp + g6);
         pushLog(tm("heal_log", { a: att.name, b: ally.name, n: g6 }));
@@ -2273,7 +2307,7 @@
       if (!allies.length) return;
       const t = allies[0];
       const ally = board[t];
-      await playHealVfx("player", attSlot, "player", t);
+      await playHealVfx("player", attSlot, "player", t, tid);
       const g5 = healGainAfterPoison(ally, 5);
       ally.hp = Math.min(ally.maxHp, ally.hp + g5);
       pushLog(tm("heal_log", { a: att.name, b: ally.name, n: g5 }));
@@ -2292,7 +2326,7 @@
       if (!targets.length) return;
       const t = targets[0];
       const ally = board[t];
-      await playHealVfx("enemy", attSlot, "enemy", t);
+      await playHealVfx("enemy", attSlot, "enemy", t, tid);
       const eg3 = healGainAfterPoison(ally, 3);
       ally.hp = Math.min(ally.maxHp, ally.hp + eg3);
       pushLog(tm("heal_log_enemy", { a: att.name, b: ally.name, n: eg3 }));
@@ -2310,7 +2344,7 @@
       for (const t of uniq) {
         const ally = board[t];
         if (!ally || ally.hp <= 0) continue;
-        await playHealVfx("enemy", attSlot, "enemy", t);
+        await playHealVfx("enemy", attSlot, "enemy", t, tid);
         const eg6 = healGainAfterPoison(ally, 6);
         ally.hp = Math.min(ally.maxHp, ally.hp + eg6);
         pushLog(tm("heal_log_enemy", { a: att.name, b: ally.name, n: eg6 }));
@@ -2334,7 +2368,7 @@
       if (!allies.length) return;
       const t = allies[0];
       const ally = board[t];
-      await playHealVfx("enemy", attSlot, "enemy", t);
+      await playHealVfx("enemy", attSlot, "enemy", t, tid);
       const eg5 = healGainAfterPoison(ally, 5);
       ally.hp = Math.min(ally.maxHp, ally.hp + eg5);
       pushLog(tm("heal_log_enemy", { a: att.name, b: ally.name, n: eg5 }));
@@ -2457,6 +2491,7 @@
             if (healRaw > 0) {
               c = ab[i];
               if (c && c.hp > 0) {
+                playCardCue("berserker", fromSide, i);
                 const heal = healGainAfterPoison(c, healRaw);
                 c.hp = Math.min(c.maxHp, c.hp + heal);
                 if (attackerIsPlayer)
@@ -2516,12 +2551,14 @@
             HOLY_WATER_MAX,
             battle.playerHolyWater + 1
           );
+          playCardCue("ganyu", fromSide, i);
           pushLog(tm("young_hw_you", { name: att.name }));
         } else {
           battle.enemyHolyWater = Math.min(
             HOLY_WATER_MAX,
             battle.enemyHolyWater + 1
           );
+          playCardCue("ganyu", fromSide, i);
           pushLog(tm("young_hw_enemy", { name: att.name }));
         }
         renderBattle();
@@ -2592,6 +2629,56 @@
     applyEndGameText();
   }
 
+  function buildPoolCard(tid, selectable) {
+    const def = getChar(tid);
+    const card = el(
+      selectable ? "button" : "article",
+      "pool-card " +
+        (def.type === "character" ? "character" : "effect") +
+        (def.tier === 2 ? " tier-2" : "")
+    );
+    if (selectable) card.type = "button";
+    card.dataset.tid = tid;
+    const thumb = el("div", "card-thumb");
+    thumb.setAttribute("aria-hidden", "true");
+    const hw = holyWaterCost(def);
+    const recPool = recruitHolyWaterCost(def);
+    if (hw > 0) {
+      thumb.appendChild(el("span", "holy-water-badge", String(hw)));
+    } else if (def.tier === 2 && def.upgradeHolyWaterCost > 0) {
+      thumb.appendChild(el("span", "holy-water-badge", String(def.upgradeHolyWaterCost)));
+    } else if (recPool > 0) {
+      thumb.appendChild(el("span", "holy-water-badge", String(recPool)));
+    }
+    const text = el("div", "card-text");
+    const name = el("div", "name", def.name);
+    const meta = el("div", "meta");
+    if (def.type === "character") {
+      const tag = targetRuleLabel(def.targetRule) || def.targetRule || "";
+      let line =
+        t("hp_meta", { hp: def.hp, dmg: def.damage }) +
+        (tag ? " · " + tag : "");
+      if (def.passiveDesc) line += ` · ${def.passiveDesc}`;
+      if (def.tier === 2)
+        line += t("tier2_pool", { n: def.upgradeHolyWaterCost || 0 });
+      else if (recPool > 0) line += t("recruit_cost", { n: recPool });
+      meta.textContent = line;
+      if (!selectable) meta.prepend(el("span", "catalog-skill", def.skill));
+    } else {
+      meta.textContent = def.desc;
+    }
+    text.appendChild(name);
+    text.appendChild(meta);
+    card.appendChild(thumb);
+    card.appendChild(text);
+    return card;
+  }
+
+  function renderCatalog() {
+    const grid = document.getElementById("catalog-grid");
+    grid.replaceChildren(...POOL_ORDER.map((id) => buildPoolCard(id, false)));
+  }
+
   function renderDeckBuilder() {
     const pool = document.getElementById("pool-grid");
     const list = document.getElementById("carried-list");
@@ -2616,46 +2703,7 @@
     }
 
     POOL_ORDER.forEach((tid) => {
-      const def = getChar(tid);
-      const card = el(
-        "button",
-        "pool-card " +
-          (def.type === "character" ? "character" : "effect") +
-          (def.tier === 2 ? " tier-2" : "")
-      );
-      card.type = "button";
-      card.dataset.tid = tid;
-      const thumb = el("div", "card-thumb");
-      thumb.setAttribute("aria-hidden", "true");
-      const hw = holyWaterCost(def);
-      const recPool = recruitHolyWaterCost(def);
-      if (hw > 0) {
-        thumb.appendChild(el("span", "holy-water-badge", String(hw)));
-      } else if (def.tier === 2 && def.upgradeHolyWaterCost > 0) {
-        thumb.appendChild(el("span", "holy-water-badge", String(def.upgradeHolyWaterCost)));
-      } else if (recPool > 0) {
-        thumb.appendChild(el("span", "holy-water-badge", String(recPool)));
-      }
-      const text = el("div", "card-text");
-      const name = el("div", "name", def.name);
-      const meta = el("div", "meta");
-      if (def.type === "character") {
-        const tag = targetRuleLabel(def.targetRule) || def.targetRule || "";
-        let line =
-          t("hp_meta", { hp: def.hp, dmg: def.damage }) +
-          (tag ? " · " + tag : "");
-        if (def.passiveDesc) line += ` · ${def.passiveDesc}`;
-        if (def.tier === 2)
-          line += t("tier2_pool", { n: def.upgradeHolyWaterCost || 0 });
-        else if (recPool > 0) line += t("recruit_cost", { n: recPool });
-        meta.textContent = line;
-      } else {
-        meta.textContent = def.desc;
-      }
-      text.appendChild(name);
-      text.appendChild(meta);
-      card.appendChild(thumb);
-      card.appendChild(text);
+      const card = buildPoolCard(tid, true);
       card.addEventListener("click", () => {
         if (carried.length >= 20) return;
         playSfx("deckAdd");
@@ -3295,6 +3343,7 @@
         battle.enemyHand.splice(hi, 1);
         battle.enemyDiscard.push(h);
         animEnemySlot(t, "anim-effect");
+        playCardCue(h.templateId, "enemy", t);
       } else if (def.effect === "buff" && allies.length) {
         const hwc = holyWaterCost(def);
         if (battle.enemyHolyWater < hwc) break;
@@ -3312,6 +3361,7 @@
         battle.enemyHand.splice(hi, 1);
         battle.enemyDiscard.push(h);
         animEnemySlot(t, "anim-effect");
+        playCardCue(h.templateId, "enemy", t);
       } else if (def.effect === "gain_holy_water") {
         const hwc = holyWaterCost(def);
         if (battle.enemyHolyWater < hwc) break;
@@ -3350,6 +3400,7 @@
         for (const j of allies) {
           board[j].hp = board[j].maxHp;
           animEnemySlot(j, "anim-effect");
+          BattleFX.burst(h.templateId, BattleFX.point("enemy", j));
         }
         pushLog(tm("ai_holy_light", { name: def.name }));
         battle.enemyHand.splice(hi, 1);
@@ -3811,6 +3862,7 @@
           c.hp = c.maxHp;
           healed++;
           animPlayerSlot(i, "anim-effect");
+          BattleFX.burst(h.templateId, BattleFX.point("player", i));
         }
       }
       removeHandCard(h.uid);
@@ -3889,6 +3941,7 @@
     pendingEffect = null;
     renderBattle();
     animPlayerSlot(slotIndex, "anim-effect");
+    playCardCue(h.templateId, "player", slotIndex);
   }
 
   async function applyPendingToEnemySlot(slotIndex) {
@@ -4187,6 +4240,83 @@
     renderBattle();
   }
 
+  function openDeckBuilder() {
+    playSfx("uiTap");
+    showScreen("screen-deck");
+    renderDeckBuilder();
+    document.getElementById("btn-deck-menu").focus();
+  }
+
+  for (const id of ["btn-one-on-one", "btn-versus-bot"]) {
+    document.getElementById(id).addEventListener("click", openDeckBuilder);
+  }
+
+  const tutorialTotal = 6;
+  let tutorialStep = 1;
+
+  function renderTutorial() {
+    document.getElementById("tutorial-progress").textContent =
+      t("tutorial_progress", { step: tutorialStep, total: tutorialTotal });
+    document.getElementById("tutorial-title").textContent = t("tutorial_title_" + tutorialStep);
+    document.getElementById("tutorial-line").textContent = t("tutorial_line_" + tutorialStep);
+    document.getElementById("btn-tutorial-prev").disabled = tutorialStep === 1;
+    document.getElementById("btn-tutorial-next").textContent =
+      t(tutorialStep === tutorialTotal ? "tutorial_practice" : "tutorial_next");
+    const image = document.getElementById("tutorial-example-image");
+    image.alt = t("tutorial_image_" + tutorialStep);
+    const source = `assets/tutorial/${GameI18n.getLang()}-${tutorialStep}.webp`;
+    image.src = source;
+    document.getElementById("tutorial-example-link").href = source;
+  }
+
+  document.getElementById("btn-tutorial").addEventListener("click", () => {
+    playSfx("uiTap");
+    tutorialStep = 1;
+    showScreen("screen-tutorial");
+    renderTutorial();
+    document.getElementById("tutorial-title").focus();
+  });
+
+  document.getElementById("btn-tutorial-menu").addEventListener("click", () => {
+    playSfx("uiTap");
+    showScreen("screen-menu");
+    document.getElementById("btn-tutorial").focus();
+  });
+
+  document.getElementById("btn-tutorial-prev").addEventListener("click", () => {
+    if (tutorialStep > 1) {
+      tutorialStep--;
+      renderTutorial();
+      document.getElementById("tutorial-title").focus();
+    }
+  });
+
+  document.getElementById("btn-tutorial-next").addEventListener("click", () => {
+    if (tutorialStep === tutorialTotal) {
+      openDeckBuilder();
+      return;
+    }
+    tutorialStep++;
+    renderTutorial();
+    document.getElementById("tutorial-title").focus();
+  });
+
+  document.getElementById("btn-view-cards").addEventListener("click", () => {
+    playSfx("uiTap");
+    showScreen("screen-cards");
+    renderCatalog();
+    document.getElementById("btn-cards-menu").focus();
+  });
+
+  for (const id of ["btn-cards-menu", "btn-deck-menu", "btn-over-menu"]) {
+    document.getElementById(id).addEventListener("click", () => {
+      battle = null;
+      playSfx("uiTap");
+      showScreen("screen-menu");
+      document.getElementById(id === "btn-cards-menu" ? "btn-view-cards" : "btn-versus-bot").focus();
+    });
+  }
+
   document.getElementById("btn-fill-random").addEventListener("click", () => {
     carried = [];
     for (let i = 0; i < 20; i++) {
@@ -4205,6 +4335,7 @@
   });
 
   document.getElementById("btn-start-battle").addEventListener("click", () => {
+    if (!document.querySelector("#screen-deck.active")) return;
     if (carried.length !== 20 || !deckHasTierOneHero(carried)) return;
     showScreen("screen-battle");
     initBattle();

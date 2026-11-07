@@ -31,7 +31,7 @@
   function unlockOnce() {
     if (unlocked) return;
     unlocked = true;
-    resume();
+    resume().catch(function () { unlocked = false; });
   }
 
   ["pointerdown", "keydown", "touchstart"].forEach(function (ev) {
@@ -52,10 +52,10 @@
     g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
   }
 
-  function tone(freq, dur, type, peak, freqEnd) {
+  function tone(freq, dur, type, peak, freqEnd, offset) {
     var c = getCtx();
     if (!c || !masterGain) return;
-    var t0 = now();
+    var t0 = now() + (offset || 0);
     var osc = c.createOscillator();
     var g = c.createGain();
     osc.type = type || "sine";
@@ -103,8 +103,53 @@
     tone(55 + (strength || 0) * 3, 0.11, "sine", 0.11, 32);
   }
 
+  // Pitched layers evoke steel, gut-string bows, horns and bells.
+  var cardSounds = {
+    warrior: [180, 2.73, "triangle", 0.15, 9],
+    mage: [440, 1.5, "sine", 0.24],
+    assassin: [740, 0.55, "triangle", 0.12, 5],
+    shadow_assassin: [310, 0.48, "sine", 0.24, 3],
+    guardian: [112, 0.61, "triangle", 0.21, 12],
+    ranger: [390, 0.64, "triangle", 0.11],
+    young_dragon: [126, 0.71, "sawtooth", 0.24, 6],
+    priest: [523, 1.33, "sine", 0.22],
+    rage_dragon: [79, 0.52, "sawtooth", 0.39, 16],
+    mirror_mage: [494, 2.02, "sine", 0.29],
+    poison_witch: [233, 0.73, "triangle", 0.31, 4],
+    poison_assassin: [610, 0.37, "triangle", 0.18, 6],
+    round_table_guardian: [196, 2.33, "triangle", 0.31, 8],
+    berserker: [146, 0.64, "sawtooth", 0.22, 14],
+    divine_archer: [740, 1.33, "triangle", 0.16],
+    holy_priest: [659, 1.5, "sine", 0.33],
+    dark_priest: [277, 0.71, "sine", 0.33],
+    heal: [587, 1.25, "sine", 0.25],
+    buff: [147, 1.5, "triangle", 0.28, 4],
+    skip: [520, 0.5, "sine", 0.44],
+    bolt: [129, 0.52, "sawtooth", 0.18, 18],
+    ganyu: [880, 1.26, "sine", 0.2],
+    recruit: [220, 1.5, "triangle", 0.28],
+    holy_light: [784, 1.5, "sine", 0.45],
+  };
+
   var GameSFX = {
     resume: resume,
+
+    cardCue: function (id) {
+      var cue = cardSounds[id];
+      if (!cue) return;
+      var base = cue[0];
+      var overtone = base * cue[1];
+      var duration = cue[3];
+      if (cue[4]) noiseHit(cue[4]);
+      tone(base, duration, cue[2], 0.13, base * 0.83);
+      tone(overtone, duration * 0.72, "sine", 0.08, overtone * 0.96, 0.045);
+    },
+
+    unitDefeat: function () {
+      noiseHit(10);
+      tone(148, 0.28, "triangle", 0.21, 41);
+      tone(311, 0.33, "sine", 0.11, 110, 0.045);
+    },
 
     uiTap: function () {
       tone(660, 0.045, "sine", 0.09, 440);

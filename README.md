@@ -1,4 +1,4 @@
-# Card Battle Game · 四格对决
+# Crownfall · 坠冕纪元
 
 **Demo URL:** **https://270820-stack.github.io/Card-Battle-Game/**
 
@@ -6,7 +6,7 @@
 
 ## Overview (English)
 
-**Card Battle Game** (Chinese title: *四格对决*) is a browser-based, medieval-themed **1v1 card battler** against an AI opponent. You build a **20-card deck** from a shared pool, deploy characters on a **2×4 lane board**, manage **Elixir**, play character and effect cards, and resolve combat with skills, passives, and **tier‑2 hero upgrades**. The UI supports **English / 中文** switching, parchment-style panels, wooden trays, and PNG assets—no build step required; open `index.html` locally or serve the folder with any static server.
+**Crownfall** (Chinese title: *坠冕纪元*) is a browser-based, medieval-themed **1v1 card battler** against an AI opponent. You build a **20-card deck** from a shared pool, deploy characters on a **2×4 lane board**, manage **Elixir**, play character and effect cards, and resolve combat with skills, passives, and **tier‑2 hero upgrades**. The UI supports **English / 中文** switching, parchment-style panels, wooden trays, and PNG assets—no build step required; open `index.html` locally or serve the folder with any static server.
 
 ### Features
 
@@ -21,13 +21,13 @@
 
 ## 简介（中文）
 
-**四格对决**是一款在浏览器中运行的**中世纪风格**的**人机 1v1 卡牌对战**小游戏。你需要从公用卡池里**构筑恰好 20 张牌**，与对方（AI）各自独立洗牌；场上为**四格一排 × 双方两排**的阵地，通过 **灵药** 费用上场角色、打出效果牌，并利用**二级英雄升级**等机制取胜。界面支持**中英切换**，以及木桌、木托盘、羊皮纸战报等视觉风格；**无需打包**，本地双击 `index.html` 或用任意静态服务器打开根目录即可游玩。
+**坠冕纪元**是一款在浏览器中运行的**中世纪风格**的**人机 1v1 卡牌对战**小游戏。你需要从公用卡池里**构筑恰好 20 张牌**，与对方（AI）各自独立洗牌；场上为**四格一排 × 双方两排**的阵地，通过 **圣水** 费用上场角色、打出效果牌，并利用**二级英雄升级**等机制取胜。界面支持**中英切换**，以及木桌、木托盘、羊皮纸战报等视觉风格；**无需打包**，本地双击 `index.html` 或用任意静态服务器打开根目录即可游玩。
 
 ### 主要玩法
 
 - **构筑**：必须选满 20 张；支持一键随机填满；与 AI 共用卡池但**独立牌堆**。
 - **对战节奏**：布阵阶段仅可放角色；**掷硬币**决定先后手；回合交替，战报在右侧羊皮纸区域展示。
-- **灵药**：每回合增长；上场与**二级升级**会消耗灵药（二级需场上对应一级英雄）。
+- **圣水**：每回合增长；上场与**二级升级**会消耗圣水（二级需场上对应一级英雄）。
 - **语言**：右上角 **ENG / 中文** 可切换界面与卡牌文案。
 - **音效与特效**：`sfx.js` 程序化音效；二级登场/升级有独立反馈与全屏短片层。
 - **资源生成**：`scripts/` 下多个 `gen_*.py` 可单独生成 PNG；`.deps/`、`.vendor/` 已忽略不入库。

@@ -20,8 +20,8 @@
   },
   "shadow_assassin": {
     "name": "暗影刺客",
-    "skill": "刺杀 6：攻击当前生命最高的敌方；同血优先右侧",
-    "passiveDesc": "被动·影刃：目标剩余生命超过 50%、75%、满血时，额外造成 3、5、7 点真实伤害（取最高档，不叠加）"
+    "skill": "影刃：攻击当前生命最高的敌方；同血优先右侧",
+    "passiveDesc": "被动·影刃：造成目标当前生命 30% 的伤害，最低 6 点"
   },
   "guardian": {
     "name": "战士",
@@ -34,7 +34,7 @@
   "young_dragon": {
     "name": "雏龙",
     "skill": "龙息 1：优先攻击正前方；若该格无角色则攻击最近一列，同距离优先右侧",
-    "passiveDesc": "被动·蓄能：每次发动攻击后获得 1 灵药"
+    "passiveDesc": "被动·蓄能：每次发动攻击后获得 1 圣水"
   },
   "priest": {
     "name": "牧师",
@@ -43,7 +43,7 @@
   "rage_dragon": {
     "name": "怒龙",
     "skill": "龙焰 1：优先攻击正前方；若该格无角色则攻击最近一列，同距离优先右侧",
-    "passiveDesc": "被动·血怒：造成伤害等于自身已损失生命（至少为 1）；若击杀目标可再发动一次相同攻击（消耗 3 灵药）"
+    "passiveDesc": "被动·血怒：造成伤害等于自身已损失生命（至少为 1）；若击杀目标可再发动一次相同攻击（消耗 3 圣水）"
   },
   "mirror_mage": {
     "name": "镜像法师",
@@ -53,17 +53,17 @@
   "poison_witch": {
     "name": "毒巫",
     "skill": "毒咒 7：随机一名敌方，7 点真实伤害并施加中毒",
-    "passiveDesc": "被动·毒咒：攻击为真实伤害；目标中毒（一回合）：治疗效力-80%，受击额外 +1"
+    "passiveDesc": "被动·毒咒：攻击为真实伤害；目标中毒（一回合）：治疗效力-80%，受击额外 +3"
   },
   "poison_assassin": {
     "name": "毒刺客",
     "skill": "毒刺 8：攻击生命最高敌方并施加中毒",
-    "passiveDesc": "被动·毒刃：目标中毒（一回合）：治疗效力-80%，受击额外 +1"
+    "passiveDesc": "被动·毒刃：目标中毒（一回合）：治疗效力-80%，受击额外 +3"
   },
   "round_table_guardian": {
     "name": "圆桌守卫",
     "skill": "盾击 3：优先攻击正前方；若该格无角色则攻击最近一列，同距离优先右侧",
-    "passiveDesc": "被动·圆桌：己方全体受到的伤害降低；场上 1/2/3/4 名圆桌守卫时分别为 30%/50%/70%/90%（单次受伤至少 1）"
+    "passiveDesc": "被动·圆桌：己方全体受到的伤害降低；场上 1/2/3/4 名圆桌守卫时分别为 20%/30%/50%/70%（单次受伤至少 1）"
   },
   "berserker": {
     "name": "狂战士",
@@ -87,31 +87,31 @@
   },
   "heal": {
     "name": "治疗术",
-    "desc": "消耗 1 点灵药。使一名己方角色回复 6 点生命"
+    "desc": "消耗 1 点圣水。使一名己方角色回复 6 点生命"
   },
   "buff": {
     "name": "战意",
-    "desc": "消耗 1 点灵药。使一名己方角色下次攻击额外造成 3 点伤害"
+    "desc": "消耗 1 点圣水。使一名己方角色下次攻击额外造成 3 点伤害"
   },
   "skip": {
     "name": "时间停滞",
-    "desc": "消耗 3 点灵药。跳过敌方下一个回合（其无法出牌与攻击）"
+    "desc": "消耗 3 点圣水。跳过敌方下一个回合（其无法出牌与攻击）"
   },
   "bolt": {
     "name": "闪电",
-    "desc": "消耗 1 点灵药。对一名敌方角色造成 2 点伤害"
+    "desc": "消耗 1 点圣水。对一名敌方角色造成 2 点伤害"
   },
   "ganyu": {
-    "name": "灵药",
-    "desc": "获得 2 点灵药。"
+    "name": "甘雨",
+    "desc": "获得 2 点圣水。"
   },
   "recruit": {
     "name": "招募",
-    "desc": "消耗 1 点灵药。从牌库抽取 2 张牌。"
+    "desc": "消耗 1 点圣水。从牌库抽取 2 张牌。"
   },
   "holy_light": {
     "name": "圣光",
-    "desc": "消耗 4 点灵药。将我方场上所有角色恢复至满血。"
+    "desc": "消耗 4 点圣水。将我方场上所有角色恢复至满血。"
   }
 },
     en: {
@@ -131,8 +131,8 @@
   },
   "shadow_assassin": {
     "name": "Shadow Assassin",
-    "skill": "Assassinate 6: Attack the highest-HP enemy; rightmost on ties",
-    "passiveDesc": "Passive · Shadow Blade: Extra 3/5/7 true damage if target remaining HP is over 50%/75%/full (highest tier only)"
+    "skill": "Shadow Strike: Attack the highest-HP enemy; rightmost on ties",
+    "passiveDesc": "Passive · Shadow Blade: Deal 30% of the target's current HP (minimum 6)"
   },
   "guardian": {
     "name": "Warrior",
@@ -164,17 +164,17 @@
   "poison_witch": {
     "name": "Poison Witch",
     "skill": "Hex 7: Random enemy, 7 true damage and Poison",
-    "passiveDesc": "Passive · Hex: Attacks are true damage; Poison (1 turn): healing −80%, +1 damage when hit"
+    "passiveDesc": "Passive · Hex: Attacks are true damage; Poison (1 turn): healing −80%, +3 damage when hit"
   },
   "poison_assassin": {
     "name": "Venom Assassin",
     "skill": "Venom Strike 8: Attack highest-HP enemy and apply Poison",
-    "passiveDesc": "Passive · Venom Blade: Poison (1 turn): healing −80%, +1 damage when hit"
+    "passiveDesc": "Passive · Venom Blade: Poison (1 turn): healing −80%, +3 damage when hit"
   },
   "round_table_guardian": {
     "name": "Round Table Guard",
     "skill": "Shield Bash 3: Prefer the front column; if empty, nearest column, rightmost on ties",
-    "passiveDesc": "Passive · Round Table: Team damage reduction 30%/50%/70%/90% with 1/2/3/4 Round Table Guards (min 1 damage)"
+    "passiveDesc": "Passive · Round Table: Team damage reduction 20%/30%/50%/70% with 1/2/3/4 Round Table Guards (min 1 damage)"
   },
   "berserker": {
     "name": "Berserker",
@@ -229,8 +229,40 @@
 
   const UI_I18N = {
     zh: {
-  "title": "四格对决 · 卡牌构筑",
-  "brand": "四格对决",
+  "title": "坠冕纪元 · 卡牌构筑",
+  "brand": "坠冕纪元",
+  "tutorial": "教程",
+  "tutorial_speaker": "王国公主",
+  "tutorial_progress": "第 {step} / {total} 课",
+  "tutorial_prev": "上一步",
+  "tutorial_next": "下一步",
+  "tutorial_practice": "开始练习",
+  "tutorial_open_image": "查看原图（在新标签页打开）",
+  "tutorial_image_1": "构筑界面显示已选满 20 张牌，右侧可开始对战。",
+  "tutorial_image_2": "布阵阶段，己方手牌中的游侠已选中，可以放入己方空格。",
+  "tutorial_image_3": "对战界面左侧下方金币显示己方拥有 12 点圣水，治疗术正等待点选目标。",
+  "tutorial_image_4": "点选场上的法师后，详情框显示生命、伤害和攻击技能。",
+  "tutorial_image_5": "守卫升级为圆桌守卫后，战报记录升级，己方剩下 2 点圣水。",
+  "tutorial_image_6": "获胜界面显示已击败 6 名敌方角色。",
+  "lang_switch": "切换至英文",
+  "tutorial_title_1": "构筑卡组",
+  "tutorial_line_1": "先挑满二十张牌，其中至少要有一名一级角色。也可以点随机填满，直接拿一副牌试试。",
+  "tutorial_title_2": "布置阵地",
+  "tutorial_line_2": "从手牌选一名一级角色，再点己方空格上阵。你有四格，布阵时上阵免费。准备好后点完成布阵，硬币会决定谁先行动。",
+  "tutorial_title_3": "获得与使用圣水",
+  "tutorial_line_3": "圣水是对战中的资源，用来打出有费用的效果牌和升级角色。你的回合开始时会获得圣水：前期每次获得 1 点，之后随对局推进增加。未用完的圣水可以留到下个回合，最多存 25 点。左侧下方金币显示你的余额，上方金币显示对手的余额。例如，治疗术消耗 1 点圣水，选中它后再点要治疗的友方角色。",
+  "tutorial_title_4": "让角色行动",
+  "tutorial_line_4": "点场上的角色查看技能。比如守卫优先攻击正前方，法师则瞄准当前生命最低的敌人。点结束回合后，场上角色会依照各自的技能自动行动。",
+  "tutorial_title_5": "升级角色",
+  "tutorial_line_5": "要升级，先选手中的二级卡，再点场上与它对应的一级角色。你还得有足够的圣水。比如，圆桌守卫可以升级守卫。",
+  "tutorial_title_6": "赢下对局",
+  "tutorial_line_6": "累计击败六名敌方角色，或者清空对方阵地，就能获胜。右侧战报会记录战况。准备好了，就去和电脑练一局吧。",
+  "menu_duel": "1v1",
+  "menu_kicker": "中世纪卡牌对决",
+  "menu_bot": "人机对战",
+  "menu_cards": "查看卡牌",
+  "menu_back": "主菜单",
+  "cards_title": "卡牌图鉴",
   "subtitle": "人机（AI）1v1 · 初始仅可布阵角色 · 掷硬币先后手 · 共用 20 张构筑（独立洗牌）",
   "deck_build_h2": "构筑卡组（已选 {n} / 20）",
   "deck_build_h2_prefix": "构筑卡组（已选 ",
@@ -253,7 +285,7 @@
   "recall": "换位 / 下阵",
   "lang_to_en": "ENG",
   "lang_to_zh": "中文",
-  "aria_holy_ops": "灵药与对局操作",
+  "aria_holy_ops": "圣水与对局操作",
   "aria_battle_log": "战斗记录",
   "aria_player_hand": "我方手牌",
   "victory": "胜利",
@@ -275,12 +307,12 @@
   "click_detail": "{name} · 点击查看详情",
   "bonus_next": "下次攻击额外 {n} 点伤害",
   "bonus_next_named": "「{name}」下次攻击额外 {n} 点伤害",
-  "tier2_pool": " · 二级（需场上一级对应英雄+{n}灵药升级）",
-  "tier2_hand": " · 二级（点场上一级对应英雄，{n}灵药）",
-  "recruit_cost": " · 对战上场{n}灵药",
+  "tier2_pool": " · 二级（需场上一级对应英雄+{n}圣水升级）",
+  "tier2_hand": " · 二级（点场上一级对应英雄，{n}圣水）",
+  "recruit_cost": " · 对战上场{n}圣水",
   "deck_hint_need_t1": "需至少包含一张一级英雄卡（如守卫、法师、刺客、战士、游侠、雏龙、牧师等）。",
   "turn_n": "回合 {n}",
-  "turn_hw_mult": " · 每回合灵药×{n}",
+  "turn_hw_mult": " · 每回合圣水×{n}",
   "win": "胜利",
   "lose": "失败",
   "win_msg": "击败次数 {n}/{max}",
@@ -318,8 +350,40 @@
     "recalled_tag": " · 下阵"
   },
   en: {
-  "title": "Four Slots · Deck Builder",
-  "brand": "Four Slots",
+  "title": "Crownfall · Deck Builder",
+  "brand": "Crownfall",
+  "tutorial": "Tutorial",
+  "tutorial_speaker": "Princess",
+  "tutorial_progress": "Lesson {step} of {total}",
+  "tutorial_prev": "Back",
+  "tutorial_next": "Next",
+  "tutorial_practice": "Practice vs Bot",
+  "tutorial_open_image": "Open full-size screenshot in a new tab",
+  "tutorial_image_1": "The deck builder shows 20 selected cards and the Start Battle button.",
+  "tutorial_image_2": "During setup, a Ranger is selected in the player’s hand and ready to deploy into an empty slot.",
+  "tutorial_image_3": "The lower coin on the left shows 12 Elixir. Heal is waiting for an allied target.",
+  "tutorial_image_4": "The Mage’s details show its health, damage, and targeting skill.",
+  "tutorial_image_5": "The battle log records a Guard upgrading to a Round Table Guard, leaving the player with 2 Elixir.",
+  "tutorial_image_6": "The victory screen shows six enemy characters defeated.",
+  "lang_switch": "Switch to Chinese",
+  "tutorial_title_1": "Build your deck",
+  "tutorial_line_1": "Pick twenty cards, including at least one tier-one character. You can also choose Fill Random to get a deck and jump straight in.",
+  "tutorial_title_2": "Deploy your line",
+  "tutorial_line_2": "Pick a tier-one character in your hand, then choose an empty slot on your side. You have four slots, and deployment is free during setup. When you choose Finish Setup, a coin toss decides who goes first.",
+  "tutorial_title_3": "Earn and spend Elixir",
+  "tutorial_line_3": "Elixir pays for effect cards with a cost and for character upgrades. You gain it at the start of your turn, beginning at 1 per turn and increasing as the match goes on. Unspent Elixir carries over, up to 25. The lower coin on the left shows your balance, and the upper coin shows the bot’s. For example, Heal costs 1 Elixir. Select it, then choose the ally you want to heal.",
+  "tutorial_title_4": "Let your cards act",
+  "tutorial_line_4": "Select a character on the board to read its skill. A Guard aims straight ahead first, while a Mage targets the enemy with the lowest current health. Choose End Turn to let your characters act automatically.",
+  "tutorial_title_5": "Upgrade a character",
+  "tutorial_line_5": "To upgrade, select a tier-two card in your hand and choose the matching tier-one character on the board. You need enough Elixir to pay the upgrade cost. For example, a Round Table Guard can upgrade a Guard.",
+  "tutorial_title_6": "Win the duel",
+  "tutorial_line_6": "Defeat six enemy characters in total, or clear the enemy board, to win. The battle log on the right tracks the action. When you are ready, try a match against the bot.",
+  "menu_duel": "1v1",
+  "menu_kicker": "A medieval card duel",
+  "menu_bot": "Versus Bot",
+  "menu_cards": "View Cards",
+  "menu_back": "Main Menu",
+  "cards_title": "Card Codex",
   "subtitle": "1v1 vs AI · Deploy characters first · Coin toss for turn order · Shared 20-card pool (shuffled separately)",
   "deck_build_h2": "Build Deck ({n} / 20 selected)",
   "deck_build_h2_prefix": "Build Deck (",
@@ -443,10 +507,10 @@
     zh: {
   "chain_shot_you": "「{name}」被动·连环：再射一箭！",
   "chain_shot_enemy": "敌方「{name}」被动·连环：再射一箭！",
-  "rage_again_you": "「{name}」被动·血怒：再发动一次（消耗 {cost} 灵药）。",
-  "rage_fail_you": "「{name}」击杀目标，但灵药不足 {cost}，无法追击。",
-  "rage_again_enemy": "敌方「{name}」被动·血怒：再发动一次（消耗 {cost} 灵药）。",
-  "rage_fail_enemy": "敌方「{name}」击杀目标，但灵药不足，无法追击。",
+  "rage_again_you": "「{name}」被动·血怒：再发动一次（消耗 {cost} 圣水）。",
+  "rage_fail_you": "「{name}」击杀目标，但圣水不足 {cost}，无法追击。",
+  "rage_again_enemy": "敌方「{name}」被动·血怒：再发动一次（消耗 {cost} 圣水）。",
+  "rage_fail_enemy": "敌方「{name}」击杀目标，但圣水不足，无法追击。",
   "life_swap": "{my}「{a}」命换：与{opp}「{b}」交换当前生命（{ha}↔{hb}）。",
   "holy_aura": "「{priest}」神圣灵光：「{target}」回复 {n} 生命。",
   "share_dmg": "「{s}」为「{t}」分担 {half} 点伤害，实际受到 {rest} 点{note}（剩余 {hp}）。",
@@ -460,8 +524,8 @@
   "lifesteal_enemy": "敌方「{name}」嗜血回复 {n} 生命。",
   "ranger_extra_you": "「{name}」连射：再射一箭！",
   "ranger_extra_enemy": "敌方「{name}」连射：再射一箭！",
-  "young_hw_you": "「{name}」雏龙：获得 1 灵药。",
-  "young_hw_enemy": "敌方「{name}」雏龙：获得 1 灵药。",
+  "young_hw_you": "「{name}」雏龙：获得 1 圣水。",
+  "young_hw_enemy": "敌方「{name}」雏龙：获得 1 圣水。",
   "ai_place": "人机在格 {slot} 放置「{name}」。",
   "ai_swap": "人机：换下「{old}」（{ohp}/{omax}），换上「{new}」（{nhp}/{nmax}）。",
   "ai_repo_swap": "人机：调整「{a}」与「{b}」的站位。",
@@ -473,36 +537,36 @@
   "you_draw1": "你抽 1 张牌。",
   "ai_heal": "人机：「{card}」·「{target}」回复生命。",
   "ai_buff": "人机：「{card}」强化「{target}」。",
-  "ai_gain_hw": "人机：「{name}」获得 {n} 点灵药。",
+  "ai_gain_hw": "人机：「{name}」获得 {n} 点圣水。",
   "ai_draw_n": "人机：「{name}」抽取 {n} 张牌。",
   "ai_holy_light": "人机：「{name}」：己方全体恢复至满血。",
   "ai_time_stop": "人机：「时间停滞」— 你下一回合将被跳过。",
-  "hw_need": "灵药不足：需要 {need} 点灵药（当前 {cur}）。",
+  "hw_need": "圣水不足：需要 {need} 点圣水（当前 {cur}）。",
   "pick_heal": "请选择一名己方角色回复生命。",
   "pick_buff": "请选择一名己方角色获得战意。",
-  "ganyu_full": "灵药已满，无法使用「灵药」。",
-  "gain_hw": "「{name}」：获得 {n} 点灵药。",
+  "ganyu_full": "圣水已满，无法使用「甘雨」。",
+  "gain_hw": "「{name}」：获得 {n} 点圣水。",
   "recruit_empty": "牌库已空，无法使用「招募」。",
   "draw_n": "「{name}」：抽取 {n} 张牌。",
   "holy_light_none": "场上没有己方角色，无法使用「圣光」。",
-  "hw_need_named": "灵药不足：「{name}」需要 {need} 点灵药（当前 {cur}）。",
+  "hw_need_named": "圣水不足：「{name}」需要 {need} 点圣水（当前 {cur}）。",
   "holy_light_done": "「{name}」：{n} 名己方角色已恢复至满血。",
-  "hw_need_skip": "灵药不足：时间停滞需要 {need} 点灵药（当前 {cur}）。",
+  "hw_need_skip": "圣水不足：时间停滞需要 {need} 点圣水（当前 {cur}）。",
   "time_stop_used": "已使用时间停滞：敌方下一回合将被跳过。",
   "pick_bolt": "请选择一名敌方场上的角色造成伤害。",
-  "hw_resolve_fail": "灵药不足，无法结算「{name}」。",
+  "hw_resolve_fail": "圣水不足，无法结算「{name}」。",
   "heal_done": "「{name}」回复 {n} 点生命{cleared}。",
   "poison_cleared": "，中毒已解除",
   "recalled": "「{name}」已下阵（生命 {hp}/{max}）。",
   "moved_empty": "「{name}」已移至空位。",
   "swapped_pos": "「{a}」与「{b}」交换位置。",
   "no_t2_setup": "布阵阶段无法使用二级英雄（请仅摆放一级英雄）。",
-  "hw_need_upgrade": "灵药不足：升级需要 {need} 点（当前 {cur}）。",
+  "hw_need_upgrade": "圣水不足：升级需要 {need} 点（当前 {cur}）。",
   "upgraded": "「{from}」已升级为「{to}」（生命 {hp}/{max}）。",
   "upgrade_only": "「{name}」只能升级场上的「{from}」。",
   "upgrade_or_recall": "「{name}」须升级场上对应的一级；从场上「下阵」回手牌的二级可再置于空位。",
   "no_t2_empty": "当前阶段无法将二级英雄置于空位。",
-  "hw_need_deploy": "灵药不足：上场「{name}」需要 {need} 点（当前 {cur}）。",
+  "hw_need_deploy": "圣水不足：上场「{name}」需要 {need} 点（当前 {cur}）。",
   "deployed": "「{name}」上场。",
   "t2_bad_slot": "无法将二级英雄置于该格。",
   "replaced": "换下「{old}」（{ohp}/{omax}），换上「{new}」（{nhp}/{nmax}）。",
