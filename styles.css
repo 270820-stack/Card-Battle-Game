@@ -247,7 +247,8 @@ body:not(:has(#screen-battle.active)) #btn-surrender { display: none; }
 .pool-card .card-thumb {
   width: 100%;
   flex: 0 0 auto;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 4 / 3;
+  max-height: 96px;
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center 22%;
@@ -731,9 +732,9 @@ body:not(:has(#screen-battle.active)) #btn-surrender { display: none; }
 .holy-water-badge {
   position: absolute;
   left: 4px;
-  top: 3px;
-  min-width: 1.65em;
-  height: 1.65em;
+  top: 4px;
+  min-width: 1.35em;
+  height: 1.35em;
   padding: 0 0.3em;
   display: inline-flex;
   align-items: center;
@@ -744,7 +745,7 @@ body:not(:has(#screen-battle.active)) #btn-surrender { display: none; }
   color: #352006;
   background: linear-gradient(155deg, #fff3a3, #ffd02e 54%, #e7a613);
   border: 1px solid #ffdf65;
-  border-radius: 50%;
+  border-radius: 4px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
   z-index: 2;
   line-height: 1;
@@ -3326,7 +3327,6 @@ body:has(#screen-menu.active) #app {
 
 :is(#screen-deck, #screen-cards) .pool-card {
   position: relative;
-  overflow: visible;
   border: 1px solid #5d4024;
   border-radius: 3px;
   padding: 3px;
@@ -3350,7 +3350,11 @@ body:has(#screen-menu.active) #app {
 .pool-card[data-tid="ganyu"] .card-thumb { background-image: url("assets/selection/ganyu.webp"); }
 .pool-card[data-tid="holy_light"] .card-thumb { background-image: url("assets/selection/holy-light.webp"); }
 
-.pool-card > .holy-water-badge { top: -7px; }
+.pool-card:is([data-tid="buff"], [data-tid="skip"], [data-tid="bolt"], [data-tid="ganyu"], [data-tid="holy_light"]) .card-thumb {
+  background-position: center;
+}
+
+.pool-card > .holy-water-badge { top: 7px; left: 7px; }
 
 #screen-deck .pool-card:hover { filter: brightness(1.13); }
 #screen-deck .deck-heading {
