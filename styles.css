@@ -116,13 +116,6 @@ body:not(:has(#screen-battle.active)) #btn-surrender { display: none; }
   text-shadow: 0 0 20px var(--glow-warm), 0 2px 4px rgba(0, 0, 0, 0.85);
 }
 
-.subtitle {
-  margin: 0.35rem 0 0;
-  color: var(--muted);
-  font-size: 0.92rem;
-  font-style: italic;
-}
-
 .screen {
   display: none;
 }
@@ -3310,8 +3303,8 @@ body:has(#screen-menu.active) #app {
   border: 4px double #9b7e54;
   border-radius: 2px;
   background:
-    repeating-linear-gradient(127deg, #dca45908 0 1px, transparent 1px 5px),
-    radial-gradient(ellipse at top, #49342a, #241b15 72%);
+    linear-gradient(150deg, #21140e19, #1b120b78),
+    #35221a url("assets/deck-leather.webp") center top / 620px auto;
   box-shadow: inset 0 0 32px #100805, 0 8px 28px #000a;
 }
 
@@ -3333,13 +3326,44 @@ body:has(#screen-menu.active) #app {
 }
 
 :is(#screen-deck, #screen-cards) .pool-card {
-  border: 3px double #8e7049;
-  border-radius: 2px;
+  position: relative;
+  border: 1px solid #5d4024;
+  border-radius: 3px;
+  padding: 3px;
   background: linear-gradient(#413126, #291712);
   box-shadow: 0 3px 8px #0c0706a0;
 }
 
-#screen-deck .pool-card:hover { border-color: #e0b778; }
+:is(#screen-deck, #screen-cards) .pool-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 13px solid transparent;
+  border-image: url("assets/deck-card-frame.webp") 41 stretch;
+  pointer-events: none;
+}
+
+#screen-deck .pool-card:hover { filter: brightness(1.13); }
+#screen-deck .deck-heading {
+  position: relative;
+  padding: .65rem .55rem;
+  border: 3px double #b08b54;
+  background:
+    linear-gradient(100deg, #541d17a8, #260d0ad9),
+    url("assets/deck-leather.webp") center / 370px;
+  box-shadow: inset 0 0 12px #1a0907, 0 3px 6px #1209049c;
+  font-size: clamp(.92rem, 1.7vw, 1.23rem);
+  color: #ffe1a5;
+  text-align: center;
+  text-shadow: 0 2px 2px #200c05;
+}
+
+.deck-count {
+  margin: 0 0 .4rem;
+  color: #e9cb97;
+  font: 600 .85rem var(--font-display);
+  font-variant-numeric: tabular-nums;
+}
 #screen-cards .pool-card { cursor: default; transform: none; }
 #screen-cards .pool-card .meta { display: block; overflow: visible; }
 .catalog-skill { display: block; margin-bottom: .25rem; color: #f1d6a8; }
@@ -3517,7 +3541,7 @@ body:has(#screen-battle.active)::before {
   .deck-roster .carried-list { max-height: 53vh; overflow-y: auto; }
 }
 
-body:has(#screen-cards.active) .top-bar .subtitle { display: none; }
+body:has(:is(#screen-deck, #screen-cards).active) .top-bar { display: none; }
 
 .battle-side.enemy .slot.filled.slot--token .slot-art--token {
   border-color: #bb8069;

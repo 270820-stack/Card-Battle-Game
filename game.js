@@ -350,25 +350,10 @@
     });
     const brand = document.querySelector(".top-bar h1");
     if (brand) brand.textContent = t("brand");
-    const sub = document.querySelector(".top-bar .subtitle");
-    if (sub) sub.textContent = t("subtitle");
-    const deckH2 = document.querySelector("#screen-deck .deck-panel h2");
-    if (deckH2) {
-      deckH2.innerHTML =
-        t("deck_build_h2_prefix") +
-        '<span id="deck-count">' +
-        (document.getElementById("deck-count")
-          ? document.getElementById("deck-count").textContent
-          : "0") +
-        "</span>" +
-        t("deck_build_h2_suffix");
-    }
     const fill = document.getElementById("btn-fill-random");
     if (fill) fill.textContent = t("btn_fill_random");
     const clear = document.getElementById("btn-clear-deck");
     if (clear) clear.textContent = t("btn_clear_deck");
-    const carriedH2 = document.querySelectorAll("#screen-deck .deck-panel h2")[1];
-    if (carriedH2) carriedH2.textContent = t("carried_h2");
     const start = document.getElementById("btn-start-battle");
     if (start) start.textContent = t("btn_start_battle");
     const sideEnemy = document.querySelector(".battle-side.enemy .side-label");
@@ -1535,56 +1520,41 @@
   }
 
   function flyHandCardFromRectToRect(rStart, rEnd, h, flyOpts) {
-    return new Promise((resolve) => {
-      if (!rStart || rStart.width < 4 || !rEnd || rEnd.width < 4) {
-        resolve();
-        return;
+    if (!rStart || !rEnd || Math.min(rStart.width, rStart.height, rEnd.width, rEnd.height) < 4) {
+      return Promise.resolve();
+    }
+    const clone = buildVfxHandCard(h);
+    clone.classList.add("fx-fly-deploy");
+    const startX = rStart.left + rStart.width / 2;
+    const startY = rStart.top + rStart.height / 2;
+    clone.style.left = startX + "px";
+    clone.style.top = startY + "px";
+    getFxLayer().appendChild(clone);
+
+    // Keep the card's own layout and fit it to each rectangle with a uniform scale.
+    const width = clone.offsetWidth;
+    const height = clone.offsetHeight;
+    const fit = (rect) => Math.min(rect.width / width, rect.height / height);
+    const startScale = fit(rStart);
+    const endScale = fit(rEnd);
+    const dx = rEnd.left + rEnd.width / 2 - startX;
+    const dy = rEnd.top + rEnd.height / 2 - startY;
+    const pose = (x, y, scale) => `translate(${x}px, ${y}px) translate(-50%, -50%) scale(${scale})`;
+    const animation = clone.animate(
+      [
+        { transform: pose(0, 0, startScale) },
+        { transform: pose(dx * .8, dy * .8, Math.max(startScale, endScale) * 1.04), offset: .62 },
+        { transform: pose(dx, dy, endScale) },
+      ],
+      { duration: 560, easing: "cubic-bezier(.25, .86, .36, 1)" }
+    );
+
+    return animation.finished.then(() => {
+      if (!flyOpts?.tier2Upgrade) {
+        const tier2Entrance = !flyOpts?.returning && getChar(h.templateId).tier === 2;
+        playSfx(tier2Entrance ? "tier2Entrance" : "cardLand", h.templateId);
       }
-      const clone = buildVfxHandCard(h);
-      clone.classList.add("fx-fly-deploy");
-      clone.style.left = rStart.left + "px";
-      clone.style.top = rStart.top + "px";
-      clone.style.width = rStart.width + "px";
-      clone.style.minHeight = rStart.height + "px";
-      const layer = getFxLayer();
-      (layer || document.body).appendChild(clone);
-
-      const dx =
-        rEnd.left +
-        rEnd.width / 2 -
-        (rStart.left + rStart.width / 2);
-      const dy =
-        rEnd.top +
-        rEnd.height / 2 -
-        (rStart.top + rStart.height / 2);
-
-      const anim = clone.animate(
-        [
-          { transform: "translate(0,0) scale(1)" },
-          {
-            transform: `translate(${dx * 0.88}px,${dy * 0.88}px) scale(1.1)`,
-            offset: 0.55,
-          },
-          {
-            transform: `translate(${dx}px,${dy}px) scale(1)`,
-            offset: 1,
-          },
-        ],
-        { duration: 560, easing: "cubic-bezier(0.25, 0.86, 0.36, 1.2)" }
-      );
-      anim.onfinish = () => {
-        clone.remove();
-        const flyDef = h && h.templateId ? getChar(h.templateId) : null;
-        if (flyOpts && flyOpts.tier2Upgrade) {
-          /* 升级短片的音效由 tier2UpgradeReveal 统一播放 */
-        } else if (flyDef && flyDef.tier === 2) {
-          playSfx("tier2Entrance", h.templateId);
-        } else {
-          playSfx("cardLand");
-        }
-        resolve();
-      };
-    });
+    }).finally(() => clone.remove());
   }
 
   function flyHandCardToSlot(fromRect, side, slotIndex, h, flyOpts) {
@@ -1597,45 +1567,16 @@
   }
 
   function flyRectToPlayerHandDock(fromRect, handRect, prev) {
-    return new Promise((resolve) => {
-      if (!fromRect || !handRect || fromRect.width < 4) {
-        resolve();
-        return;
-      }
-      const h = { uid: "fx", templateId: prev.templateId };
-      const clone = buildVfxHandCard(h);
-      clone.classList.add("fx-fly-deploy");
-      clone.style.left = fromRect.left + "px";
-      clone.style.top = fromRect.top + "px";
-      clone.style.width = fromRect.width + "px";
-      clone.style.minHeight = fromRect.height + "px";
-      const layer = getFxLayer();
-      (layer || document.body).appendChild(clone);
-      const endLeft =
-        handRect.left + handRect.width / 2 - fromRect.width / 2;
-      const endTop = handRect.bottom - fromRect.height - 6;
-      const dx = endLeft - fromRect.left;
-      const dy = endTop - fromRect.top;
-      const anim = clone.animate(
-        [
-          { transform: "translate(0,0) scale(1)" },
-          {
-            transform: `translate(${dx * 0.88}px,${dy * 0.88}px) scale(0.95)`,
-            offset: 0.55,
-          },
-          {
-            transform: `translate(${dx}px,${dy}px) scale(0.82)`,
-            offset: 1,
-          },
-        ],
-        { duration: 540, easing: "cubic-bezier(0.25, 0.85, 0.35, 1.15)" }
-      );
-      anim.onfinish = () => {
-        clone.remove();
-        playSfx("cardLand");
-        resolve();
-      };
-    });
+    if (!fromRect || !handRect) return Promise.resolve();
+    const width = Math.min(fromRect.width, handRect.width);
+    const height = Math.min(fromRect.height, handRect.height);
+    const destination = {
+      left: handRect.left + (handRect.width - width) / 2,
+      top: handRect.bottom - height - 6,
+      width,
+      height,
+    };
+    return flyHandCardFromRectToRect(fromRect, destination, prev, { returning: true });
   }
 
   function getPlayerHandCardRect(uidStr) {

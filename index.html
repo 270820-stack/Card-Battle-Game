@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
-  <link rel="icon" href="assets/crownfall-crest.svg" type="image/svg+xml" />
+  <link rel="icon" href="assets/crownfall-emblem.png" type="image/png" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -19,13 +19,12 @@
   <div id="app">
     <header class="top-bar">
       <h1>坠冕纪元</h1>
-      <p class="subtitle">人机（AI）1v1 · 初始仅可布阵角色 · 掷硬币先后手 · 共用 20 张构筑（独立洗牌）</p>
     </header>
 
     <section id="screen-menu" class="screen active" aria-labelledby="menu-title">
       <img class="menu-guide" src="assets/royal-tactician.webp" alt="" fetchpriority="high" />
       <div class="menu-content">
-        <img class="menu-crest" src="assets/crownfall-crest.svg" alt="" />
+        <img class="menu-crest" src="assets/crownfall-emblem.png" alt="" />
         <h1 id="menu-title" data-ui="brand">坠冕纪元</h1>
         <p class="menu-kicker" data-ui="menu_kicker">中世纪卡牌对决</p>
         <nav class="menu-actions">
@@ -73,7 +72,8 @@
     <section id="screen-deck" class="screen">
       <button type="button" id="btn-deck-menu" class="btn secondary screen-back" data-ui="menu_back">主菜单</button>
       <div class="deck-panel">
-        <h2>构筑卡组（已选 <span id="deck-count">0</span> / 20）</h2>
+        <h2 class="deck-heading" data-ui="deck_build_title">编列战阵</h2>
+        <p class="deck-count"><span data-ui="deck_selected">已选</span> <span id="deck-count">0</span> / 20</p>
         <p id="deck-hint" class="deck-hint" aria-live="polite"></p>
         <div class="deck-actions">
           <button type="button" id="btn-fill-random" class="btn secondary">随机填满</button>
@@ -82,7 +82,7 @@
         <div id="pool-grid" class="card-grid"></div>
       </div>
       <div class="deck-panel deck-roster">
-        <h2>当前携带</h2>
+        <h2 class="deck-heading" data-ui="carried_h2">出征名册</h2>
         <div id="carried-list" class="carried-list"></div>
         <button type="button" id="btn-start-battle" class="btn primary" disabled>开始对战</button>
       </div>
