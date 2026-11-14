@@ -12,7 +12,7 @@
   }
 
   function playCardCue(id, side, slot) {
-    BattleFX.burst(id, BattleFX.point(side, slot));
+    BattleFX.burst(id, BattleFX.point(side, slot), isTier2HeroDef(getChar(id)) ? "tier2" : "impact");
     playSfx("cardCue", id);
   }
 
@@ -1470,12 +1470,20 @@
     wrap.appendChild(beams);
     wrap.appendChild(pulse);
     wrap.appendChild(label);
+    const reveal = buildVfxHandCard({ templateId: tid });
+    reveal.classList.add("fx-tier2-portrait");
+    wrap.appendChild(reveal);
     layer.appendChild(wrap);
     vid.play().catch(function () {
       /* 自动播放被拦截时仍保留 CSS 层 */
     });
     BattleFX.burst(tid, { x: cx, y: cy }, "upgrade");
     playSfx("tier2UpgradeReveal");
+    window.setTimeout(() => {
+      if (!wrap.isConnected) return;
+      BattleFX.burst(tid, { x: cx, y: cy }, "tier2");
+      playSfx("tier2Entrance", tid);
+    }, 1050);
     window.setTimeout(() => {
       wrap.remove();
     }, 2000);
@@ -1784,6 +1792,8 @@
     playSfx("cardCue", templateId);
     const source = { x: x1, y: y1 };
     const target = { x: x2, y: y2 };
+    const upgraded = isTier2HeroDef(getChar(templateId));
+    if (upgraded) BattleFX.tier2Strike(templateId, source, target);
     if (templateId === "ranger" || templateId === "divine_archer") {
       await Promise.all([
         vfxArrowLine(x1, y1, x2, y2),
@@ -1799,7 +1809,7 @@
       await BattleFX.travel(templateId, source, target);
     }
 
-    BattleFX.burst(templateId, target);
+    BattleFX.burst(templateId, target, upgraded ? "tier2" : "impact");
     playHitImpact(toSide, toSlot, x2, y2, damageAmount);
     await delay(160);
   }
@@ -1811,8 +1821,10 @@
     if (fromSide === "player") animPlayerSlot(fromSlot, "anim-attack");
     else animEnemySlot(fromSlot, "anim-attack");
     playSfx("cardCue", templateId);
+    const upgraded = isTier2HeroDef(getChar(templateId));
+    if (upgraded) BattleFX.tier2Strike(templateId, source, target);
     await BattleFX.travel(templateId, source, target);
-    BattleFX.burst(templateId, target);
+    BattleFX.burst(templateId, target, upgraded ? "tier2" : "impact");
     if (toSide === "player") animPlayerSlot(toSlot, "anim-effect");
     else animEnemySlot(toSlot, "anim-effect");
     playSfx("heal");

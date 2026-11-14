@@ -1123,12 +1123,7 @@ body:not(:has(#screen-battle.active)) #btn-surrender { display: none; }
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
 }
 
-.board-card-detail-thumb.tier-2 {
-  border: 2px solid #c0392b;
-  box-shadow:
-    0 0 0 1px rgba(192, 57, 43, 0.35),
-    0 4px 16px rgba(0, 0, 0, 0.45);
-}
+.board-card-detail-thumb.tier-2 { position: relative; }
 
 .board-card-detail-name {
   font-family: var(--font-display);
@@ -3693,4 +3688,129 @@ body:has(#screen-tutorial.active) #app {
   .tutorial-dialogue::before, .tutorial-dialogue::after { background-size: 2.65rem; }
   .tutorial-actions { gap: .4rem; }
   .tutorial-actions .btn { padding-inline: .65em; }
+}
+
+/* Card colors follow the character or spell across the catalog and hand. */
+[data-tid="warrior"] { --card-color: #4c4440; }
+[data-tid="mage"] { --card-color: #442754; }
+[data-tid="assassin"] { --card-color: #374256; }
+[data-tid="shadow_assassin"] { --card-color: #482858; }
+[data-tid="guardian"] { --card-color: #603829; }
+[data-tid="ranger"] { --card-color: #364a2b; }
+[data-tid="young_dragon"] { --card-color: #703c21; }
+[data-tid="priest"] { --card-color: #554932; }
+[data-tid="rage_dragon"] { --card-color: #73251b; }
+[data-tid="mirror_mage"] { --card-color: #284a67; }
+[data-tid="poison_witch"] { --card-color: #445323; }
+[data-tid="poison_assassin"] { --card-color: #254b39; }
+[data-tid="round_table_guardian"] { --card-color: #53516a; }
+[data-tid="berserker"] { --card-color: #702e32; }
+[data-tid="divine_archer"] { --card-color: #635223; }
+[data-tid="holy_priest"] { --card-color: #635837; }
+[data-tid="dark_priest"] { --card-color: #492943; }
+[data-tid="heal"] { --card-color: #3e592d; }
+[data-tid="buff"] { --card-color: #683a29; }
+[data-tid="skip"] { --card-color: #3b3e63; }
+[data-tid="bolt"] { --card-color: #455373; }
+[data-tid="ganyu"] { --card-color: #275365; }
+[data-tid="recruit"] { --card-color: #634231; }
+[data-tid="holy_light"] { --card-color: #6b5428; }
+
+:is(.pool-card, .hand-card)[data-tid] .card-text {
+  background:
+    radial-gradient(ellipse at top, var(--card-color), transparent 120%),
+    #130e0b;
+}
+
+:is(.pool-card, .hand-card)[data-tid] .meta { color: #e4d6c4; }
+
+:is(#screen-deck, #screen-cards) .pool-card.tier-2::after,
+.hand-card.tier-2[data-tid]::after,
+.board-card-detail-thumb.tier-2::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 16px solid transparent;
+  border-image: url("assets/tier-two-card-frame.webp") 50 stretch;
+  pointer-events: none;
+}
+
+.hand-card.tier-2[data-tid]::after { border-width: 12px; }
+
+.fx-tier2-portrait {
+  position: absolute;
+  z-index: 6;
+  left: var(--fx-x);
+  top: var(--fx-y);
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 0 32px var(--t2-label-glow-1), 0 12px 28px #120a08;
+  animation: tier2-card-reveal 2s ease-in-out both;
+}
+
+@keyframes tier2-card-reveal {
+  0%, 12% { opacity: 0; transform: translate(-50%, -50%) scale(.6); }
+  30% { opacity: 1; transform: translate(-50%, -62%) scale(1.3); }
+  55% { opacity: 1; transform: translate(-50%, -58%) scale(1.18); }
+  76%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(.72); }
+}
+
+.battle-fx--tier2 { width: 9rem; height: 9rem; z-index: 7; }
+.battle-fx--tier2 .battle-fx-mark { font-size: 3.4rem; }
+.battle-fx--tier2::before { border-width: 3px; }
+.battle-fx--tier2::after { animation-duration: .78s; }
+.battle-fx--tier2 i { width: .65rem; height: .26rem; }
+.battle-fx--upgrade i { animation-duration: .95s; }
+
+.battle-fx-strike {
+  width: var(--strike-length);
+  height: 0;
+  z-index: 6;
+  transform-origin: left center;
+  transform: rotate(var(--strike-angle));
+}
+
+.battle-fx-strike i {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, transparent, currentColor 53%, #fff3da);
+  box-shadow: 0 0 13px currentColor;
+  transform-origin: left center;
+  animation: tier2-strike .55s ease-out both;
+}
+
+.battle-fx-strike i:nth-child(2) { top: -10px; animation-delay: .055s; }
+.battle-fx-strike i:nth-child(3) { top: 10px; animation-delay: .11s; }
+.battle-fx-strike.battle-fx--breath i { height: 16px; filter: blur(3px); }
+.battle-fx-strike.battle-fx--cut i { height: 3px; rotate: -3deg; }
+.battle-fx-strike.battle-fx--ward i { height: 9px; }
+.battle-fx-strike.battle-fx--spell i { background: repeating-linear-gradient(90deg, transparent 0 8%, currentColor 13% 17%, transparent 22%); }
+.battle-fx-strike[data-tid="mirror_mage"] i:nth-child(2) { rotate: 5deg; }
+.battle-fx-strike[data-tid="mirror_mage"] i:nth-child(3) { rotate: -5deg; }
+.battle-fx-strike[data-tid="berserker"] i:nth-child(2) { rotate: 6deg; }
+.battle-fx-strike[data-tid="divine_archer"] i { height: 3px; }
+.battle-fx-strike[data-tid="holy_priest"] i { height: 8px; background: linear-gradient(90deg, transparent, currentColor, #fff3da); }
+.battle-fx-strike[data-tid="dark_priest"] i { rotate: -4deg; }
+.battle-fx-strike[data-tid="poison_witch"] i,
+.battle-fx-strike[data-tid="poison_assassin"] i { filter: blur(2px); }
+
+@keyframes tier2-strike {
+  0% { opacity: 0; transform: scaleX(.05); }
+  37% { opacity: .88; transform: scaleX(1); }
+  100% { opacity: 0; transform: scaleX(1) scaleY(.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-tier2-portrait {
+    transform: translate(-50%, -50%);
+    animation-name: tier2-card-reveal-still;
+  }
+}
+
+@keyframes tier2-card-reveal-still {
+  0%, 12%, 76%, 100% { opacity: 0; }
+  30%, 55% { opacity: 1; }
 }

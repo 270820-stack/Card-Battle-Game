@@ -59,11 +59,11 @@
     node.appendChild(sigil);
 
     if (!motionQuery.matches) {
-      const particles = mode === "upgrade" ? 18 : 9;
+      const particles = mode === "upgrade" ? 28 : mode === "tier2" ? 18 : 9;
       for (let i = 0; i < particles; i++) {
         const spark = document.createElement("i");
         const angle = i * Math.PI * 2 / particles + 0.2;
-        const distance = 33 + (i % 4) * 13;
+        const distance = (mode === "tier2" || mode === "upgrade" ? 52 : 33) + (i % 4) * 16;
         spark.style.setProperty("--dx", Math.cos(angle) * distance + "px");
         spark.style.setProperty("--dy", Math.sin(angle) * distance + "px");
         spark.style.setProperty("--rot", angle + "rad");
@@ -72,7 +72,22 @@
       }
     }
 
-    setTimeout(() => node.remove(), mode === "upgrade" ? 1100 : 680);
+    setTimeout(() => node.remove(), mode === "upgrade" ? 1400 : mode === "tier2" ? 900 : 680);
+  }
+
+  function tier2Strike(id, from, to) {
+    if (!from || !to || motionQuery.matches) return;
+    const [, color, family] = signatures[id];
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const length = Math.hypot(dx, dy);
+    if (length < 2) return;
+    const strike = place(`battle-fx-strike battle-fx--${family}`, from.x, from.y, color);
+    strike.dataset.tid = id;
+    strike.style.setProperty("--strike-length", length + "px");
+    strike.style.setProperty("--strike-angle", Math.atan2(dy, dx) + "rad");
+    strike.append(document.createElement("i"), document.createElement("i"), document.createElement("i"));
+    setTimeout(() => strike.remove(), 800);
   }
 
   function defeat(id, side, slot) {
@@ -106,5 +121,5 @@
     }
   }
 
-  window.BattleFX = { point, burst, defeat, travel };
+  window.BattleFX = { point, burst, defeat, travel, tier2Strike };
 })();
