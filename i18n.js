@@ -63,7 +63,7 @@
   "round_table_guardian": {
     "name": "圆桌守卫",
     "skill": "盾击 3：优先攻击正前方；若该格无角色则攻击最近一列，同距离优先右侧",
-    "passiveDesc": "被动·圆桌：己方全体受到的伤害降低；场上 1/2/3/4 名圆桌守卫时分别为 20%/30%/50%/70%（单次受伤至少 1）"
+    "passiveDesc": "被动·圆桌：己方全体受到的伤害降低；场上 1/2/3/4 名圆桌守卫时分别为 20%/30%/40%/50%（单次受伤至少 1）"
   },
   "berserker": {
     "name": "狂战士",
@@ -72,7 +72,7 @@
   },
   "divine_archer": {
     "name": "神箭手",
-    "skill": "连射 4：每次只射一箭；基础 3 箭，每箭后按目标血线判定是否再射一箭",
+    "skill": "连射 4：每次只射一箭；基础 3 箭，每箭后按目标血线判定是否再射一箭，单次最多 6 箭",
     "passiveDesc": "被动·连环：每射一箭后按该箭目标当前血线判定，>50% 则 20% 再射一箭，否则 40%"
   },
   "holy_priest": {
@@ -91,7 +91,7 @@
   },
   "buff": {
     "name": "战意",
-    "desc": "消耗 1 点圣水。使一名己方角色下次攻击额外造成 3 点伤害"
+    "desc": "消耗 1 点圣水。使一名己方角色下次命中额外造成 3 点伤害"
   },
   "skip": {
     "name": "时间停滞",
@@ -174,7 +174,7 @@
   "round_table_guardian": {
     "name": "Round Table Guard",
     "skill": "Shield Bash 3: Prefer the front column; if empty, nearest column, rightmost on ties",
-    "passiveDesc": "Passive · Round Table: Team damage reduction 20%/30%/50%/70% with 1/2/3/4 Round Table Guards (min 1 damage)"
+    "passiveDesc": "Passive · Round Table: Team damage reduction 20%/30%/40%/50% with 1/2/3/4 Round Table Guards (min 1 damage)"
   },
   "berserker": {
     "name": "Berserker",
@@ -183,7 +183,7 @@
   },
   "divine_archer": {
     "name": "Divine Archer",
-    "skill": "Volley: One arrow at a time; 3 base shots, then check HP for extra shots",
+    "skill": "Volley 4: Fire 3 arrows one at a time, with a chance for extra shots. Maximum 6 arrows per attack.",
     "passiveDesc": "Passive · Chain: After each shot, 20% chance to shoot again if target >50% HP, else 40%"
   },
   "holy_priest": {
@@ -202,7 +202,7 @@
   },
   "buff": {
     "name": "Battle Fury",
-    "desc": "Costs 1 Elixir. An ally deals +3 damage on their next attack."
+    "desc": "Costs 1 Elixir. An ally deals +3 damage on their next hit."
   },
   "skip": {
     "name": "Time Stop",
@@ -265,6 +265,7 @@
   "cards_title": "卡牌图鉴",
   "deck_build_title": "编列战阵",
   "deck_selected": "已选",
+  "deck_time_stop_limit": "每副卡组最多携带 {n} 张时间停滞。",
   "btn_fill_random": "随机填满",
   "btn_clear_deck": "清空",
   "carried_h2": "出征名册",
@@ -303,14 +304,13 @@
   "empty_slot": "空位",
   "empty": "空",
   "click_detail": "{name} · 点击查看详情",
-  "bonus_next": "下次攻击额外 {n} 点伤害",
-  "bonus_next_named": "「{name}」下次攻击额外 {n} 点伤害",
+  "bonus_next": "下次命中额外 {n} 点伤害",
+  "bonus_next_named": "「{name}」下次命中额外 {n} 点伤害",
   "tier2_pool": " · 二级（需场上一级对应英雄+{n}圣水升级）",
   "tier2_hand": " · 二级（点场上一级对应英雄，{n}圣水）",
   "recruit_cost": " · 对战上场{n}圣水",
   "deck_hint_need_t1": "需至少包含一张一级英雄卡（如守卫、法师、刺客、战士、游侠、雏龙、牧师等）。",
   "turn_n": "回合 {n}",
-  "turn_hw_mult": " · 每回合圣水×{n}",
   "win": "胜利",
   "lose": "失败",
   "win_msg": "击败次数 {n}/{max}",
@@ -384,6 +384,7 @@
   "cards_title": "Card Codex",
   "deck_build_title": "Muster Your Forces",
   "deck_selected": "Selected",
+  "deck_time_stop_limit": "Time Stop is limited to {n} copies per deck.",
   "btn_fill_random": "Fill Random",
   "btn_clear_deck": "Clear",
   "carried_h2": "War Roster",
@@ -422,14 +423,13 @@
   "empty_slot": "Empty",
   "empty": "Empty",
   "click_detail": "{name} · Click for details",
-  "bonus_next": "Next attack +{n} damage",
-  "bonus_next_named": "“{name}” next attack +{n} damage",
+  "bonus_next": "Next hit +{n} damage",
+  "bonus_next_named": "“{name}” next hit +{n} damage",
   "tier2_pool": " · Tier-2 (needs matching Tier-1 on board + {n} Elixir)",
   "tier2_hand": " · Tier-2 (click matching Tier-1, {n} Elixir)",
   "recruit_cost": " · Deploy costs {n} Elixir",
   "deck_hint_need_t1": "Include at least one Tier-1 hero (Guard, Mage, Assassin, Warrior, Ranger, Hatchling, Priest, etc.).",
   "turn_n": "Turn {n}",
-  "turn_hw_mult": " · Elixir ×{n}/turn",
   "win": "Victory",
   "lose": "Defeat",
   "win_msg": "Defeats {n}/{max}",

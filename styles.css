@@ -214,7 +214,11 @@ body:not(:has(#screen-battle.active)) #btn-surrender { display: none; }
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 0.6rem;
+  gap: 1rem 0.6rem;
+}
+
+#pool-grid {
+  grid-auto-rows: 1fr;
 }
 
 .pool-card {
@@ -243,9 +247,9 @@ body:not(:has(#screen-battle.active)) #btn-surrender { display: none; }
 .pool-card .card-thumb {
   width: 100%;
   flex: 0 0 auto;
-  aspect-ratio: 4 / 3;
-  max-height: 96px;
+  aspect-ratio: 4 / 5;
   background-size: cover;
+  background-repeat: no-repeat;
   background-position: center 22%;
   border-bottom: 1px solid rgba(92, 74, 50, 0.65);
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
@@ -727,9 +731,9 @@ body:not(:has(#screen-battle.active)) #btn-surrender { display: none; }
 .holy-water-badge {
   position: absolute;
   left: 4px;
-  top: 4px;
-  min-width: 1.35em;
-  height: 1.35em;
+  top: 3px;
+  min-width: 1.65em;
+  height: 1.65em;
   padding: 0 0.3em;
   display: inline-flex;
   align-items: center;
@@ -737,10 +741,10 @@ body:not(:has(#screen-battle.active)) #btn-surrender { display: none; }
   font-family: var(--font-display);
   font-size: 0.7rem;
   font-weight: 700;
-  color: #e8f2fa;
-  background: linear-gradient(180deg, #3a6288 0%, #243d54 100%);
-  border: 1px solid rgba(130, 175, 210, 0.55);
-  border-radius: 4px;
+  color: #352006;
+  background: linear-gradient(155deg, #fff3a3, #ffd02e 54%, #e7a613);
+  border: 1px solid #ffdf65;
+  border-radius: 50%;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
   z-index: 2;
   line-height: 1;
@@ -3322,6 +3326,7 @@ body:has(#screen-menu.active) #app {
 
 :is(#screen-deck, #screen-cards) .pool-card {
   position: relative;
+  overflow: visible;
   border: 1px solid #5d4024;
   border-radius: 3px;
   padding: 3px;
@@ -3337,6 +3342,15 @@ body:has(#screen-menu.active) #app {
   border-image: url("assets/deck-card-frame.webp") 41 stretch;
   pointer-events: none;
 }
+
+/* Selection crops use the original artwork without its baked-in border. */
+.pool-card[data-tid="buff"] .card-thumb { background-image: url("assets/selection/buff.webp"); }
+.pool-card[data-tid="skip"] .card-thumb { background-image: url("assets/selection/skip.webp"); }
+.pool-card[data-tid="bolt"] .card-thumb { background-image: url("assets/selection/bolt.webp"); }
+.pool-card[data-tid="ganyu"] .card-thumb { background-image: url("assets/selection/ganyu.webp"); }
+.pool-card[data-tid="holy_light"] .card-thumb { background-image: url("assets/selection/holy-light.webp"); }
+
+.pool-card > .holy-water-badge { top: -7px; }
 
 #screen-deck .pool-card:hover { filter: brightness(1.13); }
 #screen-deck .deck-heading {
@@ -3690,15 +3704,8 @@ body:has(#screen-tutorial.active) #app {
   .tutorial-actions .btn { padding-inline: .65em; }
 }
 
-/* Card colors follow the character or spell across the catalog and hand. */
-[data-tid="warrior"] { --card-color: #4c4440; }
-[data-tid="mage"] { --card-color: #442754; }
-[data-tid="assassin"] { --card-color: #374256; }
+/* Tier 2 cards use a background color tied to the hero. */
 [data-tid="shadow_assassin"] { --card-color: #482858; }
-[data-tid="guardian"] { --card-color: #603829; }
-[data-tid="ranger"] { --card-color: #364a2b; }
-[data-tid="young_dragon"] { --card-color: #703c21; }
-[data-tid="priest"] { --card-color: #554932; }
 [data-tid="rage_dragon"] { --card-color: #73251b; }
 [data-tid="mirror_mage"] { --card-color: #284a67; }
 [data-tid="poison_witch"] { --card-color: #445323; }
@@ -3708,21 +3715,14 @@ body:has(#screen-tutorial.active) #app {
 [data-tid="divine_archer"] { --card-color: #635223; }
 [data-tid="holy_priest"] { --card-color: #635837; }
 [data-tid="dark_priest"] { --card-color: #492943; }
-[data-tid="heal"] { --card-color: #3e592d; }
-[data-tid="buff"] { --card-color: #683a29; }
-[data-tid="skip"] { --card-color: #3b3e63; }
-[data-tid="bolt"] { --card-color: #455373; }
-[data-tid="ganyu"] { --card-color: #275365; }
-[data-tid="recruit"] { --card-color: #634231; }
-[data-tid="holy_light"] { --card-color: #6b5428; }
 
-:is(.pool-card, .hand-card)[data-tid] .card-text {
+:is(.pool-card, .hand-card).tier-2 .card-text {
   background:
     radial-gradient(ellipse at top, var(--card-color), transparent 120%),
     #130e0b;
 }
 
-:is(.pool-card, .hand-card)[data-tid] .meta { color: #e4d6c4; }
+:is(.pool-card, .hand-card).tier-2 .meta { color: #e4d6c4; }
 
 :is(#screen-deck, #screen-cards) .pool-card.tier-2::after,
 .hand-card.tier-2[data-tid]::after,
@@ -3813,4 +3813,16 @@ body:has(#screen-tutorial.active) #app {
 @keyframes tier2-card-reveal-still {
   0%, 12%, 76%, 100% { opacity: 0; }
   30%, 55% { opacity: 1; }
+}
+
+
+.elixir-multiplier {
+  color: #f1ce87;
+  font: 700 1.2rem/1 var(--font-display);
+  text-shadow: 0 2px 4px #160c05;
+}
+
+.pool-card:disabled {
+  cursor: not-allowed;
+  opacity: .55;
 }

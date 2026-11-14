@@ -167,7 +167,7 @@
       skill:
         "盾击 3：优先攻击正前方；若该格无角色则攻击最近一列，同距离优先右侧",
       passiveDesc:
-        "被动·圆桌：己方全体受到的伤害降低；场上 1/2/3/4 名圆桌守卫时分别为 20%/30%/50%/70%（单次受伤至少 1）",
+        "被动·圆桌：己方全体受到的伤害降低；场上 1/2/3/4 名圆桌守卫时分别为 20%/30%/40%/50%（单次受伤至少 1）",
     },
     berserker: {
       type: "character",
@@ -191,10 +191,10 @@
       upgradeHolyWaterCost: 12,
       name: "神箭手",
       hp: 20,
-      damage: 5,
+      damage: 4,
       targetRule: "three_random",
       skill:
-        "连射 4：每次只射一箭；基础 3 箭，每箭后按目标血线判定是否再射一箭",
+        "连射 4：每次只射一箭；基础 3 箭，每箭后按目标血线判定是否再射一箭，单次最多 6 箭",
       passive: "repeatAttack30",
       passiveDesc:
         "被动·连环：每射一箭后按该箭目标当前血线判定，>50% 则 20% 再射一箭，否则 40%",
@@ -239,7 +239,7 @@
     buff: {
       type: "effect",
       name: "战意",
-      desc: "消耗 1 点圣水。使一名己方角色下次攻击额外造成 3 点伤害",
+      desc: "消耗 1 点圣水。使一名己方角色下次命中额外造成 3 点伤害",
       effect: "buff",
       value: 3,
     },
@@ -307,6 +307,7 @@
 
   const HOLY_WATER_PER_TURN = 1;
   const HOLY_WATER_MAX = 25;
+  const TIME_STOP_DECK_LIMIT = 2;
 
   /** 累计击败对方角色达此数即胜（可换将累加，与场上 4 格无关）。 */
   const WIN_DEFEAT_COUNT = 6;
@@ -426,7 +427,6 @@
     if (def.effect === "gain_holy_water") return 0;
     if (def.effect === "skip") return 3;
     if (def.effect === "heal_all_full") return 4;
-    if (def.effect === "buff") return 0;
     return 1;
   }
 
@@ -436,9 +436,9 @@
     return def.recruitHolyWaterCost || 0;
   }
 
-  /** 第几次「回合开始领圣水」（双方轮流各计一次）；≥8 为 2 倍，≥15 为 3 倍。 */
+  /** 双方每次开始获得圣水时共用的回合计数。 */
   function holyWaterGainAmountForTurn() {
-    const n = battle.turnCount || 0;
+    const n = battle?.turnCount || 0;
     if (n >= 15) return HOLY_WATER_PER_TURN * 5;
     if (n >= 10) return HOLY_WATER_PER_TURN * 3;
     if (n >= 5) return HOLY_WATER_PER_TURN * 2;
@@ -470,6 +470,8 @@
     const ew = battle ? battle.enemyHolyWater : 0;
     pNum.textContent = String(pw);
     eNum.textContent = String(ew);
+    document.getElementById("elixir-multiplier").textContent =
+      "x" + holyWaterGainAmountForTurn() / HOLY_WATER_PER_TURN;
   }
 
   function updateTurnCounter() {
@@ -479,12 +481,7 @@
       el.textContent = "";
       return;
     }
-    const n = battle.turnCount || 0;
-    const mult =
-      n >= 15 ? 5 : n >= 10 ? 3 : n >= 5 ? 2 : 1;
-    let text = t("turn_n", { n });
-    if (mult > 1) text += t("turn_hw_mult", { n: mult });
-    el.textContent = text;
+    el.textContent = t("turn_n", { n: battle.turnCount || 0 });
   }
 
   function targetRuleLabel(rule) {
@@ -763,7 +760,7 @@
 
   /**
    * 神箭手追击：按该箭命中格上的单位当前 hp/maxHp 判定；
-   * 该格已空（被击倒）视为 0% 血线 →65%。
+   * 该格已空（被击倒）视为 0% 血线 →40%。
    */
   function divineArcherRepeatChanceFromTarget(foeBoard, lastHitSlot) {
     if (lastHitSlot == null || lastHitSlot < 0 || lastHitSlot > 3) return 0.4;
@@ -775,9 +772,9 @@
 
   /** 神箭手：基础 3 支单箭；每箭后判定是否 +1 支；总箭数上限防极端长链。 */
   const DIVINE_ARCHER_BASE_SHOTS = 3;
-  const DIVINE_ARCHER_MAX_ARROWS_PER_ATTACK = 24;
+  const DIVINE_ARCHER_MAX_ARROWS_PER_ATTACK = 6;
 
-  async function executeDivineArcherVolleyPlayer(slotIndex, tid, dmg) {
+  async function executeDivineArcherVolleyPlayer(slotIndex, tid, damage, bonus) {
     const attacker = battle.playerBoard[slotIndex];
     if (!attacker || attacker.hp <= 0) return;
     let pending = DIVINE_ARCHER_BASE_SHOTS;
@@ -790,6 +787,7 @@
       if (!valid.length) return;
       const j = valid[(Math.random() * valid.length) | 0];
       pending--;
+      const dmg = damage + (arrowsShot === 0 ? bonus : 0);
       arrowsShot++;
       await delay(350);
       await playAttackVfx(tid, "player", slotIndex, "enemy", j, dmg);
@@ -799,7 +797,7 @@
       if (playerWinCondition()) return;
 
       const chaseP = divineArcherRepeatChanceFromTarget(battle.enemyBoard, j);
-      if (Math.random() < chaseP) {
+      if (arrowsShot < DIVINE_ARCHER_MAX_ARROWS_PER_ATTACK && Math.random() < chaseP) {
         const att = battle.playerBoard[slotIndex];
         if (!att || att.hp <= 0) return;
         pending++;
@@ -809,7 +807,7 @@
     }
   }
 
-  async function executeDivineArcherVolleyEnemy(slotIndex, tid, dmg) {
+  async function executeDivineArcherVolleyEnemy(slotIndex, tid, damage, bonus) {
     const attacker = battle.enemyBoard[slotIndex];
     if (!attacker || attacker.hp <= 0) return;
     let pending = DIVINE_ARCHER_BASE_SHOTS;
@@ -822,6 +820,7 @@
       if (!valid.length) return;
       const j = valid[(Math.random() * valid.length) | 0];
       pending--;
+      const dmg = damage + (arrowsShot === 0 ? bonus : 0);
       arrowsShot++;
       await delay(350);
       await playAttackVfx(tid, "enemy", slotIndex, "player", j, dmg);
@@ -831,7 +830,7 @@
       if (enemyWinCondition()) return;
 
       const chaseP = divineArcherRepeatChanceFromTarget(battle.playerBoard, j);
-      if (Math.random() < chaseP) {
+      if (arrowsShot < DIVINE_ARCHER_MAX_ARROWS_PER_ATTACK && Math.random() < chaseP) {
         const att = battle.enemyBoard[slotIndex];
         if (!att || att.hp <= 0) return;
         pending++;
@@ -1247,7 +1246,7 @@
   }
 
   /** 圆桌守卫数量（1～4）→ 全队伤害减免比例。 */
-  const ROUND_TABLE_DR_BY_COUNT = [0, 0.2, 0.3, 0.5, 0.7];
+  const ROUND_TABLE_DR_BY_COUNT = [0, 0.2, 0.3, 0.4, 0.5];
 
   /** @param {boolean} [trueDamage] 真实伤害：不吃圆桌护佑与一级守卫分担（如刺客被动追加）。 */
   function applyDamageWithShare(board, targetSlot, amount, victimIsPlayer, trueDamage) {
@@ -1269,7 +1268,7 @@
         const n = Math.min(rtCount, 4);
         const rate = ROUND_TABLE_DR_BY_COUNT[n];
         const mult = Math.max(0, 1 - rate);
-        effectiveAmount = Math.floor(incoming * mult + 1e-9);
+        effectiveAmount = Math.round(incoming * mult);
         if (effectiveAmount < 1) effectiveAmount = 1;
         if (effectiveAmount < incoming) playCardCue("round_table_guardian", side, targetSlot);
       }
@@ -1489,6 +1488,11 @@
     }, 2000);
   }
 
+  function appendElixirBadge(card, def) {
+    const cost = holyWaterCost(def) || def.upgradeHolyWaterCost || recruitHolyWaterCost(def);
+    if (cost > 0) card.appendChild(el("span", "holy-water-badge", String(cost)));
+  }
+
   /** 用于飞行动画的临时手牌 DOM（与场上手牌样式一致） */
   function buildVfxHandCard(h) {
     const def = getChar(h.templateId);
@@ -1503,17 +1507,7 @@
     card.dataset.tid = h.templateId;
     const thumb = el("div", "card-thumb");
     thumb.setAttribute("aria-hidden", "true");
-    const hwCost = holyWaterCost(def);
-    const recCost = recruitHolyWaterCost(def);
-    if (hwCost > 0) {
-      thumb.appendChild(el("span", "holy-water-badge", String(hwCost)));
-    } else if (isT2 && def.upgradeHolyWaterCost > 0) {
-      thumb.appendChild(
-        el("span", "holy-water-badge", String(def.upgradeHolyWaterCost))
-      );
-    } else if (recCost > 0) {
-      thumb.appendChild(el("span", "holy-water-badge", String(recCost)));
-    }
+    appendElixirBadge(card, def);
     const text = el("div", "card-text");
     text.appendChild(el("div", "name", def.name));
     const meta = el("div", "meta");
@@ -2208,7 +2202,7 @@
     return battle.playerDefeatCount >= WIN_DEFEAT_COUNT || playerWiped();
   }
 
-  async function executePriestFamilyAttackPlayer(attSlot, tid) {
+  async function executePriestFamilyAttackPlayer(attSlot, tid, bonus) {
     const board = battle.playerBoard;
     const att = board[attSlot];
     if (!att || att.hp <= 0) return;
@@ -2250,8 +2244,9 @@
       const foes = livingEnemySlots();
       if (foes.length) {
         const j = foes[(Math.random() * foes.length) | 0];
-        await playAttackVfx(tid, "player", attSlot, "enemy", j, 5);
-        await dealDamageToEnemySlot(j, 5);
+        const damage = 5 + bonus;
+        await playAttackVfx(tid, "player", attSlot, "enemy", j, damage);
+        await dealDamageToEnemySlot(j, damage);
         await removeDead(battle.enemyBoard, true);
         renderBattle();
         if (playerWinCondition()) return;
@@ -2269,7 +2264,7 @@
     }
   }
 
-  async function executePriestFamilyAttackEnemy(attSlot, tid) {
+  async function executePriestFamilyAttackEnemy(attSlot, tid, bonus) {
     const board = battle.enemyBoard;
     const att = board[attSlot];
     if (!att || att.hp <= 0) return;
@@ -2311,8 +2306,9 @@
       const foes = livingPlayerSlots();
       if (foes.length) {
         const j = foes[(Math.random() * foes.length) | 0];
-        await playAttackVfx(tid, "enemy", attSlot, "player", j, 5);
-        await dealDamageToPlayerSlot(j, 5);
+        const damage = 5 + bonus;
+        await playAttackVfx(tid, "enemy", attSlot, "player", j, damage);
+        await dealDamageToPlayerSlot(j, damage);
         await removeDead(battle.playerBoard, false);
         renderBattle();
         if (enemyWinCondition()) return;
@@ -2361,13 +2357,13 @@
     const tid = c.templateId;
     const rule = def.targetRule || "front_nearest_right";
     const extra = c.bonusDamage || 0;
-    c.bonusDamage = 0;
+    if (tid !== "priest" && tid !== "holy_priest") c.bonusDamage = 0;
     const dmg = c.damage + extra;
 
     if (tid === "divine_archer" && rule === "three_random") {
       await delay(leadDelay);
-      if (attackerIsPlayer) await executeDivineArcherVolleyPlayer(i, tid, dmg);
-      else await executeDivineArcherVolleyEnemy(i, tid, dmg);
+      if (attackerIsPlayer) await executeDivineArcherVolleyPlayer(i, tid, c.damage, extra);
+      else await executeDivineArcherVolleyEnemy(i, tid, c.damage, extra);
       return;
     }
 
@@ -2384,8 +2380,8 @@
       tid === "dark_priest"
     ) {
       await delay(leadDelay);
-      if (attackerIsPlayer) await executePriestFamilyAttackPlayer(i, tid);
-      else await executePriestFamilyAttackEnemy(i, tid);
+      if (attackerIsPlayer) await executePriestFamilyAttackPlayer(i, tid, extra);
+      else await executePriestFamilyAttackEnemy(i, tid, extra);
       return;
     }
 
@@ -2429,7 +2425,8 @@
       for (let k = 0; k < living.length; k++) {
         const j = living[k];
         if (!fb[j] || fb[j].hp <= 0) continue;
-        const hitDmg = tid === "berserker" ? dmg + rampIdx : dmg;
+        const hitDmg = c.damage + (tid === "berserker" ? rampIdx : 0) +
+          (rampIdx === 0 ? extra : 0);
         rampIdx++;
         await delay(volleyDelay);
         await playAttackVfx(tid, fromSide, i, toSide, j, hitDmg);
@@ -2472,8 +2469,9 @@
         if (!living.length) break;
         const j = living[(Math.random() * living.length) | 0];
         await delay(volleyDelay);
-        await playAttackVfx(tid, fromSide, i, toSide, j, dmg);
-        await dealToFoe(j, dmg);
+        const hitDmg = shot === 0 ? dmg : c.damage;
+        await playAttackVfx(tid, fromSide, i, toSide, j, hitDmg);
+        await dealToFoe(j, hitDmg);
         await removeDeadFoes();
         renderBattle();
         if (win()) return;
@@ -2594,15 +2592,8 @@
     card.dataset.tid = tid;
     const thumb = el("div", "card-thumb");
     thumb.setAttribute("aria-hidden", "true");
-    const hw = holyWaterCost(def);
     const recPool = recruitHolyWaterCost(def);
-    if (hw > 0) {
-      thumb.appendChild(el("span", "holy-water-badge", String(hw)));
-    } else if (def.tier === 2 && def.upgradeHolyWaterCost > 0) {
-      thumb.appendChild(el("span", "holy-water-badge", String(def.upgradeHolyWaterCost)));
-    } else if (recPool > 0) {
-      thumb.appendChild(el("span", "holy-water-badge", String(recPool)));
-    }
+    appendElixirBadge(card, def);
     const text = el("div", "card-text");
     const name = el("div", "name", def.name);
     const meta = el("div", "meta");
@@ -2632,6 +2623,15 @@
     grid.replaceChildren(...POOL_ORDER.map((id) => buildPoolCard(id, false)));
   }
 
+  function timeStopCount(cards) {
+    return cards.filter((id) => id === "skip").length;
+  }
+
+  function isValidDeck(cards) {
+    return cards.length === 20 && deckHasTierOneHero(cards) &&
+      timeStopCount(cards) <= TIME_STOP_DECK_LIMIT;
+  }
+
   function renderDeckBuilder() {
     const pool = document.getElementById("pool-grid");
     const list = document.getElementById("carried-list");
@@ -2641,14 +2641,17 @@
     list.innerHTML = "";
 
     countEl.textContent = String(carried.length);
-    const canStart =
-      carried.length === 20 && deckHasTierOneHero(carried);
+    const canStart = isValidDeck(carried);
+    const atTimeStopLimit = timeStopCount(carried) >= TIME_STOP_DECK_LIMIT;
     btnStart.disabled = !canStart;
     const hintEl = document.getElementById("deck-hint");
     if (hintEl) {
       if (carried.length === 20 && !deckHasTierOneHero(carried)) {
         hintEl.textContent = t("deck_hint_need_t1");
         hintEl.classList.add("deck-hint--warn");
+      } else if (atTimeStopLimit) {
+        hintEl.textContent = t("deck_time_stop_limit", { n: TIME_STOP_DECK_LIMIT });
+        hintEl.classList.remove("deck-hint--warn");
       } else {
         hintEl.textContent = "";
         hintEl.classList.remove("deck-hint--warn");
@@ -2657,8 +2660,9 @@
 
     POOL_ORDER.forEach((tid) => {
       const card = buildPoolCard(tid, true);
+      card.disabled = tid === "skip" && atTimeStopLimit;
       card.addEventListener("click", () => {
-        if (carried.length >= 20) return;
+        if (card.disabled || carried.length >= 20) return;
         playSfx("deckAdd");
         carried.push(tid);
         renderDeckBuilder();
@@ -3003,30 +3007,23 @@
     }
   }
 
-  const ENEMY_TIER2_UPGRADES = [
-    { tier2: "shadow_assassin", from: "assassin", cost: 10 },
-    { tier2: "poison_assassin", from: "assassin", cost: 9 },
-    { tier2: "mirror_mage", from: "mage", cost: 10 },
-    { tier2: "poison_witch", from: "mage", cost: 10 },
-    { tier2: "round_table_guardian", from: "warrior", cost: 7 },
-    { tier2: "berserker", from: "guardian", cost: 7 },
-    { tier2: "divine_archer", from: "ranger", cost: 8 },
-    { tier2: "rage_dragon", from: "young_dragon", cost: 7 },
-    { tier2: "holy_priest", from: "priest", cost: 11 },
-    { tier2: "dark_priest", from: "priest", cost: 12 },
+  const ENEMY_UPGRADE_PRIORITY = [
+    "shadow_assassin", "poison_assassin", "mirror_mage", "poison_witch",
+    "round_table_guardian", "berserker", "divine_archer", "rage_dragon",
+    "holy_priest", "dark_priest",
   ];
 
   async function enemyTryTier2Upgrades() {
     await delay(500);
-    for (const u of ENEMY_TIER2_UPGRADES) {
-      const hand = battle.enemyHand.find((h) => h.templateId === u.tier2);
-      if (!hand) continue;
-      if (battle.enemyHolyWater < u.cost) continue;
-      const def = getChar(u.tier2);
+    for (const tier2 of ENEMY_UPGRADE_PRIORITY) {
+      const def = getChar(tier2);
+      const hand = battle.enemyHand.find((h) => h.templateId === tier2);
+      const cost = def.upgradeHolyWaterCost;
+      if (!hand || battle.enemyHolyWater < cost) continue;
       for (let i = 0; i < 4; i++) {
         const c = battle.enemyBoard[i];
         if (!c || c.hp <= 0) continue;
-        if (c.templateId !== u.from) continue;
+        if (c.templateId !== def.upgradesFrom) continue;
         renderBattle();
         const rectT2 = getEnemyHandCardRect(hand.uid);
         if (rectT2)
@@ -3034,7 +3031,7 @@
             tier2Upgrade: true,
           });
         else await delay(380);
-        battle.enemyHolyWater -= u.cost;
+        battle.enemyHolyWater -= cost;
         const oldMax = c.maxHp;
         const newHp = Math.min(def.hp, c.hp + (def.hp - oldMax));
         const hi = battle.enemyHand.indexOf(hand);
@@ -3042,19 +3039,19 @@
         battle.enemyHand.splice(hi, 1);
         battle.enemyDiscard.push(hand);
         const upgraded = {
-          templateId: u.tier2,
+          templateId: tier2,
           name: def.name,
           hp: newHp,
           maxHp: def.hp,
           damage: def.damage,
           bonusDamage: 0,
         };
-        attachHolyPriestReactiveFields(upgraded, u.tier2);
+        attachHolyPriestReactiveFields(upgraded, tier2);
         battle.enemyBoard[i] = upgraded;
-        pushLog(tm("ai_upgrade", { from: getChar(u.from).name, to: def.name, hp: newHp, max: def.hp }));
+        pushLog(tm("ai_upgrade", { from: getChar(def.upgradesFrom).name, to: def.name, hp: newHp, max: def.hp }));
         renderBattle();
         requestAnimationFrame(() => {
-          playTier2UpgradeEffect(i, "enemy", u.tier2);
+          playTier2UpgradeEffect(i, "enemy", tier2);
         });
         if (!rectT2) animEnemySlot(i, "anim-enter");
         return;
@@ -3561,13 +3558,7 @@
       thumb.setAttribute("aria-hidden", "true");
       const hwCost = holyWaterCost(def);
       const recCost = recruitHolyWaterCost(def);
-      if (hwCost > 0) {
-        thumb.appendChild(el("span", "holy-water-badge", String(hwCost)));
-      } else if (isT2 && def.upgradeHolyWaterCost > 0) {
-        thumb.appendChild(el("span", "holy-water-badge", String(def.upgradeHolyWaterCost)));
-      } else if (recCost > 0) {
-        thumb.appendChild(el("span", "holy-water-badge", String(recCost)));
-      }
+      appendElixirBadge(card, def);
       const text = el("div", "card-text");
       text.appendChild(el("div", "name", def.name));
       const meta = el("div", "meta");
@@ -4273,7 +4264,10 @@
   document.getElementById("btn-fill-random").addEventListener("click", () => {
     carried = [];
     for (let i = 0; i < 20; i++) {
-      carried.push(POOL_ORDER[(Math.random() * POOL_ORDER.length) | 0]);
+      const pool = timeStopCount(carried) < TIME_STOP_DECK_LIMIT
+        ? POOL_ORDER
+        : POOL_ORDER.filter((id) => id !== "skip");
+      carried.push(pool[(Math.random() * pool.length) | 0]);
     }
     if (!deckHasTierOneHero(carried)) {
       carried[(Math.random() * 20) | 0] =
@@ -4289,7 +4283,7 @@
 
   document.getElementById("btn-start-battle").addEventListener("click", () => {
     if (!document.querySelector("#screen-deck.active")) return;
-    if (carried.length !== 20 || !deckHasTierOneHero(carried)) return;
+    if (!isValidDeck(carried)) return;
     showScreen("screen-battle");
     initBattle();
   });
